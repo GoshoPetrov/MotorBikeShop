@@ -1,27 +1,33 @@
-﻿using NuGet.ContentModel;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+using MotorBikeShop.Areas.Identity.Data.Entities;
 
-namespace MotorBikeShop.Areas.Identity.Data.Entities
+/// <summary>
+/// Represents a single item inside a shopping basket.
+/// </summary>
+public class BasketItem
 {
-    public class BasketItem
-    {
-        [Key]
-        public int Id { get; set; }
+    [Key]
+    public int Id { get; set; }
 
-        [Required]
-        public int BasketId { get; set; }
+    [Required]
+    public int BasketId { get; set; }
 
-        [Required]
-        public int ModelId { get; set; }
+    /// <summary>
+    /// Foreign key referencing the BikeModel.
+    /// </summary>
+    [Required]
+    public int BikeModelId { get; set; }
 
-        [Range(1, int.MaxValue)]
-        public int Quantity { get; set; }
+    [Range(1, int.MaxValue)]
+    public int Quantity { get; set; }
 
-        [ForeignKey(nameof(BasketId))]
-        public Basket Basket { get; set; } = null!;
+    [ForeignKey(nameof(BasketId))]
+    public Basket Basket { get; set; } = null!;
 
-        [ForeignKey(nameof(ModelId))]
-        public Model Model { get; set; } = null!;
-    }
+    /// <summary>
+    /// Navigation property – the motorbike model in this basket item.
+    /// </summary>
+    [ForeignKey(nameof(BikeModelId))]
+    public BikeModel BikeModel { get; set; } = null!;
 }

@@ -8,6 +8,14 @@ namespace MotorBikeShop.Data;
 
 public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
 {
+    public DbSet<BikeModel> BikeModels => Set<BikeModel>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<User> ShopUsers => Set<User>();
+    public DbSet<Basket> Baskets => Set<Basket>();
+    public DbSet<BasketItem> BasketItems => Set<BasketItem>();
+    public DbSet<Vent> Vents => Set<Vent>();
+    public DbSet<VentItem> VentItems => Set<VentItem>();
+
     public MotorBikeShopContext(DbContextOptions<MotorBikeShopContext> options)
         : base(options)
     {
@@ -16,9 +24,10 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // MODELS
-        modelBuilder.Entity<Model>().HasData(
-            new Model
+
+        // BIKE MODELS
+        modelBuilder.Entity<BikeModel>().HasData(
+            new BikeModel
             {
                 Id = 1,
                 Name = "CBR600RR",
@@ -26,7 +35,7 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
                 Year = 2022,
                 Price = 12000
             },
-            new Model
+            new BikeModel
             {
                 Id = 2,
                 Name = "YZF-R1",
@@ -41,18 +50,18 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
             new Inventory
             {
                 Id = 1,
-                ModelId = 1,
+                BikeModelId = 1,
                 Quantity = 5
             },
             new Inventory
             {
                 Id = 2,
-                ModelId = 2,
+                BikeModelId = 2,
                 Quantity = 3
             }
         );
 
-        // USERS
+        // USERS (NOTE: This is separate from Identity users)
         modelBuilder.Entity<User>().HasData(
             new User
             {
@@ -78,7 +87,7 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
             {
                 Id = 1,
                 BasketId = 1,
-                ModelId = 1,
+                BikeModelId = 1,
                 Quantity = 1
             }
         );
@@ -100,7 +109,7 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
             {
                 Id = 1,
                 VentId = 1,
-                ModelId = 1,
+                BikeModelId = 1,
                 Quantity = 1,
                 Price = 12000
             }

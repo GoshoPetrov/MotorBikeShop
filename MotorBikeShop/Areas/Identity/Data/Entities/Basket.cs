@@ -1,19 +1,33 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using MotorBikeShop.Areas.Identity.Data.Entities;
 
-namespace MotorBikeShop.Areas.Identity.Data.Entities
+/// <summary>
+/// Represents a shopping cart for a user.
+/// </summary>
+public class Basket
 {
-    public class Basket
-    {
-        [Key]
-        public int Id { get; set; }
+    /// <summary>
+    /// Primary key – unique identifier for the basket.
+    /// </summary>
+    [Key]
+    public int Id { get; set; }
 
-        [Required]
-        public int UserId { get; set; }
+    /// <summary>
+    /// Foreign key referencing the User who owns this basket.
+    /// </summary>
+    [Required]
+    public int UserId { get; set; }
 
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; } = null!;
+    /// <summary>
+    /// Navigation property – the user who owns this basket.
+    /// </summary>
+    [ForeignKey(nameof(UserId))]
+    public User User { get; set; } = null!;
 
-        public ICollection<BasketItem> Items { get; set; } = new List<BasketItem>();
-    }
+    /// <summary>
+    /// Navigation property – collection of items in the basket.
+    /// One basket can contain multiple items.
+    /// </summary>
+    public ICollection<BasketItem> Items { get; set; } = new List<BasketItem>();
 }
