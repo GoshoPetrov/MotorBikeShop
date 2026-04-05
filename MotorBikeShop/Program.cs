@@ -6,7 +6,7 @@ namespace MotorBikeShop
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             var connectionString = builder.Configuration.GetConnectionString("MotorBikeShopContextConnection") ?? throw new InvalidOperationException("Connection string 'MotorBikeShopContextConnection' not found.");
@@ -19,6 +19,16 @@ namespace MotorBikeShop
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                var userManager = services.GetRequiredService<UserManager<MotorBikeShopUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                await IdentitySeeder.SeedAsync(userManager, roleManager);
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MotorBikeShop.Areas.Identity.Data;
 using MotorBikeShop.Areas.Identity.Data.Entities;
 
 /// <summary>
@@ -34,7 +35,7 @@ public class Vent
     /// Navigation property – the user who made the order.
     /// </summary>
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = null!;
+    public MotorBikeShopUser User { get; set; } = null!;
 
     /// <summary>
     /// Navigation property – collection of items included in the order.

@@ -10,7 +10,6 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
 {
     public DbSet<BikeModel> BikeModels => Set<BikeModel>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
-    public DbSet<User> ShopUsers => Set<User>();
     public DbSet<Basket> Baskets => Set<Basket>();
     public DbSet<BasketItem> BasketItems => Set<BasketItem>();
     public DbSet<Vent> Vents => Set<Vent>();
@@ -24,6 +23,41 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<BikeModel>()
+            .HasOne(b => b.Inventory)
+            .WithOne(i => i.BikeModel)
+            .HasForeignKey<Inventory>(i => i.BikeModelId);
+
+        modelBuilder.Entity<MotorBikeShopUser>()
+            .HasOne(u => u.Basket)
+            .WithOne(b => b.User)
+            .HasForeignKey<Basket>(b => b.UserId);
+
+        modelBuilder.Entity<Basket>()
+            .HasMany(b => b.Items)
+            .WithOne(i => i.Basket)
+            .HasForeignKey(i => i.BasketId);
+
+        modelBuilder.Entity<BasketItem>()
+            .HasOne(bi => bi.BikeModel)
+            .WithMany()
+            .HasForeignKey(bi => bi.BikeModelId);
+
+        modelBuilder.Entity<MotorBikeShopUser>()
+            .HasMany(u => u.Vents)
+            .WithOne(v => v.User)
+            .HasForeignKey(v => v.UserId);
+
+        modelBuilder.Entity<Vent>()
+            .HasMany(v => v.Items)
+            .WithOne(vi => vi.Vent)
+            .HasForeignKey(vi => vi.VentId);
+
+        modelBuilder.Entity<VentItem>()
+            .HasOne(vi => vi.BikeModel)
+            .WithMany()
+            .HasForeignKey(vi => vi.BikeModelId);
 
         // BIKE MODELS
         modelBuilder.Entity<BikeModel>().HasData(
@@ -58,17 +92,6 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
                 Id = 2,
                 BikeModelId = 2,
                 Quantity = 3
-            }
-        );
-
-        // USERS (NOTE: This is separate from Identity users)
-        modelBuilder.Entity<User>().HasData(
-            new User
-            {
-                Id = 1,
-                Username = "admin",
-                Email = "admin@shop.com",
-                PasswordHash = "hashed_password"
             }
         );
 
