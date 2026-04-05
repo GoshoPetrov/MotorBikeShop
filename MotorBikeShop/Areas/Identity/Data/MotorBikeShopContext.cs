@@ -95,14 +95,6 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
             }
         );
 
-        // BASKET
-        modelBuilder.Entity<Basket>().HasData(
-            new Basket
-            {
-                Id = 1,
-                UserId = 1
-            }
-        );
 
         // BASKET ITEMS
         modelBuilder.Entity<BasketItem>().HasData(
@@ -115,16 +107,6 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
             }
         );
 
-        // VENTS (Orders)
-        modelBuilder.Entity<Vent>().HasData(
-            new Vent
-            {
-                Id = 1,
-                UserId = 1,
-                CreatedAt = DateTime.UtcNow,
-                TotalPrice = 12000
-            }
-        );
 
         // VENT ITEMS
         modelBuilder.Entity<VentItem>().HasData(

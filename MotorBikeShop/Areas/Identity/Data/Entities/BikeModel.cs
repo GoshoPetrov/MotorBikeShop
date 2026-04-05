@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MotorBikeShop.Areas.Identity.Data.Entities
 {
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     /// <summary>
     /// Represents a motorbike model that is sold in the shop.
@@ -40,6 +41,7 @@ namespace MotorBikeShop.Areas.Identity.Data.Entities
         /// Price of the motorbike.
         /// </summary>
         [Range(0, double.MaxValue)]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         /// <summary>

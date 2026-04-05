@@ -18,7 +18,7 @@ public class Basket
     /// Foreign key referencing the User who owns this basket.
     /// </summary>
     [Required]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     /// <summary>
     /// Navigation property – the user who owns this basket.

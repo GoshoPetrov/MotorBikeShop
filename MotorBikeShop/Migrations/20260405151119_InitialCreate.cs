@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace MotorBikeShop.Migrations
 {
     /// <inheritdoc />
@@ -48,6 +50,23 @@ namespace MotorBikeShop.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BikeModels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Brand = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BikeModels", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,6 +175,149 @@ namespace MotorBikeShop.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Baskets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Baskets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Baskets_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vents_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Inventories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BikeModelId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Inventories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Inventories_BikeModels_BikeModelId",
+                        column: x => x.BikeModelId,
+                        principalTable: "BikeModels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BasketItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BasketId = table.Column<int>(type: "int", nullable: false),
+                    BikeModelId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BasketItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BasketItems_Baskets_BasketId",
+                        column: x => x.BasketId,
+                        principalTable: "Baskets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BasketItems_BikeModels_BikeModelId",
+                        column: x => x.BikeModelId,
+                        principalTable: "BikeModels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VentItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VentId = table.Column<int>(type: "int", nullable: false),
+                    BikeModelId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VentItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VentItems_BikeModels_BikeModelId",
+                        column: x => x.BikeModelId,
+                        principalTable: "BikeModels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VentItems_Vents_VentId",
+                        column: x => x.VentId,
+                        principalTable: "Vents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "BikeModels",
+                columns: new[] { "Id", "Brand", "Description", "Name", "Price", "Year" },
+                values: new object[,]
+                {
+                    { 1, "Honda", null, "CBR600RR", 12000m, 2022 },
+                    { 2, "Yamaha", null, "YZF-R1", 18000m, 2023 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "BasketItems",
+                columns: new[] { "Id", "BasketId", "BikeModelId", "Quantity" },
+                values: new object[] { 1, 1, 1, 1 });
+
+            migrationBuilder.InsertData(
+                table: "Inventories",
+                columns: new[] { "Id", "BikeModelId", "Quantity" },
+                values: new object[,]
+                {
+                    { 1, 1, 5 },
+                    { 2, 2, 3 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "VentItems",
+                columns: new[] { "Id", "BikeModelId", "Price", "Quantity", "VentId" },
+                values: new object[] { 1, 1, 12000m, 1, 1 });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -194,6 +356,43 @@ namespace MotorBikeShop.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BasketItems_BasketId",
+                table: "BasketItems",
+                column: "BasketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BasketItems_BikeModelId",
+                table: "BasketItems",
+                column: "BikeModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Baskets_UserId",
+                table: "Baskets",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Inventories_BikeModelId",
+                table: "Inventories",
+                column: "BikeModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VentItems_BikeModelId",
+                table: "VentItems",
+                column: "BikeModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VentItems_VentId",
+                table: "VentItems",
+                column: "VentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vents_UserId",
+                table: "Vents",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -215,7 +414,25 @@ namespace MotorBikeShop.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BasketItems");
+
+            migrationBuilder.DropTable(
+                name: "Inventories");
+
+            migrationBuilder.DropTable(
+                name: "VentItems");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Baskets");
+
+            migrationBuilder.DropTable(
+                name: "BikeModels");
+
+            migrationBuilder.DropTable(
+                name: "Vents");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

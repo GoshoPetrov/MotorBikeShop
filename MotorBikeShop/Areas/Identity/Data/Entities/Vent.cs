@@ -18,7 +18,7 @@ public class Vent
     /// Foreign key referencing the User who made the order.
     /// </summary>
     [Required]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     /// <summary>
     /// Date and time when the order was created.
@@ -29,6 +29,7 @@ public class Vent
     /// Total price of the entire order.
     /// </summary>
     [Range(0, double.MaxValue)]
+    [Column(TypeName = "decimal(18,2)")]
     public decimal TotalPrice { get; set; }
 
     /// <summary>

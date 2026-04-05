@@ -22,6 +22,61 @@ namespace MotorBikeShop.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Basket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Baskets");
+                });
+
+            modelBuilder.Entity("BasketItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BasketId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BikeModelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BasketId");
+
+                    b.HasIndex("BikeModelId");
+
+                    b.ToTable("BasketItems");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BasketId = 1,
+                            BikeModelId = 1,
+                            Quantity = 1
+                        });
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -159,6 +214,132 @@ namespace MotorBikeShop.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BikeModels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Brand = "Honda",
+                            Name = "CBR600RR",
+                            Price = 12000m,
+                            Year = 2022
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Brand = "Yamaha",
+                            Name = "YZF-R1",
+                            Price = 18000m,
+                            Year = 2023
+                        });
+                });
+
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.Inventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BikeModelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BikeModelId")
+                        .IsUnique();
+
+                    b.ToTable("Inventories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BikeModelId = 1,
+                            Quantity = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BikeModelId = 2,
+                            Quantity = 3
+                        });
+                });
+
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.VentItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BikeModelId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BikeModelId");
+
+                    b.HasIndex("VentId");
+
+                    b.ToTable("VentItems");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BikeModelId = 1,
+                            Price = 12000m,
+                            Quantity = 1,
+                            VentId = 1
+                        });
+                });
+
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", b =>
                 {
                     b.Property<string>("Id")
@@ -224,6 +405,61 @@ namespace MotorBikeShop.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Vent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Vents");
+                });
+
+            modelBuilder.Entity("Basket", b =>
+                {
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", "User")
+                        .WithOne("Basket")
+                        .HasForeignKey("Basket", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BasketItem", b =>
+                {
+                    b.HasOne("Basket", "Basket")
+                        .WithMany("Items")
+                        .HasForeignKey("BasketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", "BikeModel")
+                        .WithMany()
+                        .HasForeignKey("BikeModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Basket");
+
+                    b.Navigation("BikeModel");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -273,6 +509,69 @@ namespace MotorBikeShop.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.Inventory", b =>
+                {
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", "BikeModel")
+                        .WithOne("Inventory")
+                        .HasForeignKey("MotorBikeShop.Areas.Identity.Data.Entities.Inventory", "BikeModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BikeModel");
+                });
+
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.VentItem", b =>
+                {
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", "BikeModel")
+                        .WithMany()
+                        .HasForeignKey("BikeModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vent", "Vent")
+                        .WithMany("Items")
+                        .HasForeignKey("VentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BikeModel");
+
+                    b.Navigation("Vent");
+                });
+
+            modelBuilder.Entity("Vent", b =>
+                {
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", "User")
+                        .WithMany("Vents")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Basket", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", b =>
+                {
+                    b.Navigation("Inventory");
+                });
+
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", b =>
+                {
+                    b.Navigation("Basket");
+
+                    b.Navigation("Vents");
+                });
+
+            modelBuilder.Entity("Vent", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
