@@ -12,8 +12,8 @@ using MotorBikeShop.Data;
 namespace MotorBikeShop.Migrations
 {
     [DbContext(typeof(MotorBikeShopContext))]
-    [Migration("20260405151751_AddRoles")]
-    partial class AddRoles
+    [Migration("20260405152139_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

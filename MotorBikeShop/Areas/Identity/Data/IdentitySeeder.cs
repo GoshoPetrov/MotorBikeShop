@@ -29,7 +29,7 @@ namespace MotorBikeShop.Areas.Identity.Data
             {
                 adminUser = new MotorBikeShopUser
                 {
-                    UserName = "admin",
+                    UserName = "admin@shop.com",
                     Email = adminEmail,
                     EmailConfirmed = true
                 };
@@ -46,7 +46,7 @@ namespace MotorBikeShop.Areas.Identity.Data
             {
                 normalUser = new MotorBikeShopUser
                 {
-                    UserName = "user",
+                    UserName = "user@shop.com",
                     Email = userEmail,
                     EmailConfirmed = true
                 };
