@@ -13,7 +13,9 @@ namespace MotorBikeShop
 
             builder.Services.AddDbContext<MotorBikeShopContext>(options => options.UseSqlServer(connectionString));
 
-            builder.Services.AddDefaultIdentity<MotorBikeShopUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<MotorBikeShopContext>();
+            builder.Services.AddDefaultIdentity<MotorBikeShopUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<MotorBikeShopContext>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

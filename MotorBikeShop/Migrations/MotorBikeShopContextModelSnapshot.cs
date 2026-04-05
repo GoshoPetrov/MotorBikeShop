@@ -66,15 +66,6 @@ namespace MotorBikeShop.Migrations
                     b.HasIndex("BikeModelId");
 
                     b.ToTable("BasketItems");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BasketId = 1,
-                            BikeModelId = 1,
-                            Quantity = 1
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -328,16 +319,6 @@ namespace MotorBikeShop.Migrations
                     b.HasIndex("VentId");
 
                     b.ToTable("VentItems");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BikeModelId = 1,
-                            Price = 12000m,
-                            Quantity = 1,
-                            VentId = 1
-                        });
                 });
 
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", b =>

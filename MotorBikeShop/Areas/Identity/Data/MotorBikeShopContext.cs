@@ -95,29 +95,5 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
             }
         );
 
-
-        // BASKET ITEMS
-        modelBuilder.Entity<BasketItem>().HasData(
-            new BasketItem
-            {
-                Id = 1,
-                BasketId = 1,
-                BikeModelId = 1,
-                Quantity = 1
-            }
-        );
-
-
-        // VENT ITEMS
-        modelBuilder.Entity<VentItem>().HasData(
-            new VentItem
-            {
-                Id = 1,
-                VentId = 1,
-                BikeModelId = 1,
-                Quantity = 1,
-                Price = 12000
-            }
-        );
     }
 }

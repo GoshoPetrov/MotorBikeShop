@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MotorBikeShop.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddRoles : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -300,11 +300,6 @@ namespace MotorBikeShop.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "BasketItems",
-                columns: new[] { "Id", "BasketId", "BikeModelId", "Quantity" },
-                values: new object[] { 1, 1, 1, 1 });
-
-            migrationBuilder.InsertData(
                 table: "Inventories",
                 columns: new[] { "Id", "BikeModelId", "Quantity" },
                 values: new object[,]
@@ -312,11 +307,6 @@ namespace MotorBikeShop.Migrations
                     { 1, 1, 5 },
                     { 2, 2, 3 }
                 });
-
-            migrationBuilder.InsertData(
-                table: "VentItems",
-                columns: new[] { "Id", "BikeModelId", "Price", "Quantity", "VentId" },
-                values: new object[] { 1, 1, 12000m, 1, 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
