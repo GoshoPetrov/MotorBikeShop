@@ -28,6 +28,16 @@
 
                         @await Html.PartialAsync("_LoginPartial")
 
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li><a asp-controller="UserPortal" asp-action="Index">User Section</a></li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li><a asp-controller="AdminPortal" asp-action="Index">Admin Section</a></li>
+                            }
+                        }
+
                     </ul>
                 </div>
             </div>
