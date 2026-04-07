@@ -1,0 +1,30 @@
+﻿@model IEnumerable<MotorBikeShop.Areas.Identity.Data.Entities.BikeModel>
+
+<h2>Bike Showcase</h2>
+
+<div class="row">
+    @foreach (var bike in Model)
+    {
+        <div class="col-md-4">
+            <div class="card" style="margin-bottom:20px;">
+
+                <!-- IMAGE -->
+                <img src="@bike.ImageUrl"
+                     class="card-img-top"
+                     style="height:200px; object-fit:cover;" />
+
+                <div class="card-body">
+                    <h5 class="card-title">@bike.Name</h5>
+                    <p><strong>Brand:</strong> @bike.Brand</p>
+                    <p><strong>Price:</strong> @bike.Price</p>
+
+                    <a asp-action="Details"
+                       asp-route-id="@bike.Id"
+                       class="btn btn-primary">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

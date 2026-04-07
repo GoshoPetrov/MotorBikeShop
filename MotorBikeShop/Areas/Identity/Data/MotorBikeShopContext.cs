@@ -67,15 +67,17 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
                 Name = "CBR600RR",
                 Brand = "Honda",
                 Year = 2022,
-                Price = 12000
+                Price = 12000,
+                ImageUrl = "https://cloudfront-us-east-1.images.arcpublishing.com/octane/K25WVPRMCVEDZJ7ZJK4BWE374Y.jpg"
             },
             new BikeModel
             {
                 Id = 2,
-                Name = "YZF-R1",
+                Name = "YZ125",
                 Brand = "Yamaha",
                 Year = 2023,
-                Price = 18000
+                Price = 18000,
+                ImageUrl = "https://ultimatemotorcycling.com/wp-content/uploads/2022/08/2023-yamaha-yz125x-first-look-gncc-cross-country-racing-two-stroke-motorcycle-dirt-bike-1.jpg"
             }
         );
 

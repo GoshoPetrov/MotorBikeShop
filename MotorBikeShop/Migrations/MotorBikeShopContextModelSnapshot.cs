@@ -222,6 +222,10 @@ namespace MotorBikeShop.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -242,6 +246,7 @@ namespace MotorBikeShop.Migrations
                         {
                             Id = 1,
                             Brand = "Honda",
+                            ImageUrl = "https://cloudfront-us-east-1.images.arcpublishing.com/octane/K25WVPRMCVEDZJ7ZJK4BWE374Y.jpg",
                             Name = "CBR600RR",
                             Price = 12000m,
                             Year = 2022
@@ -250,7 +255,8 @@ namespace MotorBikeShop.Migrations
                         {
                             Id = 2,
                             Brand = "Yamaha",
-                            Name = "YZF-R1",
+                            ImageUrl = "https://ultimatemotorcycling.com/wp-content/uploads/2022/08/2023-yamaha-yz125x-first-look-gncc-cross-country-racing-two-stroke-motorcycle-dirt-bike-1.jpg",
+                            Name = "YZ125",
                             Price = 18000m,
                             Year = 2023
                         });

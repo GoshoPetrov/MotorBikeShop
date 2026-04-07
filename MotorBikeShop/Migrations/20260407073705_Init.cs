@@ -62,7 +62,8 @@ namespace MotorBikeShop.Migrations
                     Brand = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -292,11 +293,11 @@ namespace MotorBikeShop.Migrations
 
             migrationBuilder.InsertData(
                 table: "BikeModels",
-                columns: new[] { "Id", "Brand", "Description", "Name", "Price", "Year" },
+                columns: new[] { "Id", "Brand", "Description", "ImageUrl", "Name", "Price", "Year" },
                 values: new object[,]
                 {
-                    { 1, "Honda", null, "CBR600RR", 12000m, 2022 },
-                    { 2, "Yamaha", null, "YZF-R1", 18000m, 2023 }
+                    { 1, "Honda", null, "https://cloudfront-us-east-1.images.arcpublishing.com/octane/K25WVPRMCVEDZJ7ZJK4BWE374Y.jpg", "CBR600RR", 12000m, 2022 },
+                    { 2, "Yamaha", null, "https://ultimatemotorcycling.com/wp-content/uploads/2022/08/2023-yamaha-yz125x-first-look-gncc-cross-country-racing-two-stroke-motorcycle-dirt-bike-1.jpg", "YZ125", 18000m, 2023 }
                 });
 
             migrationBuilder.InsertData(

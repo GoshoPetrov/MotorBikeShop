@@ -55,5 +55,7 @@ namespace MotorBikeShop.Areas.Identity.Data.Entities
         /// Each model has exactly one inventory record.
         /// </summary>
         public Inventory? Inventory { get; set; }
+
+        public string ImageUrl { get; set; }
     }
 }
