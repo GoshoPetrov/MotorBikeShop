@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MotorBikeShop.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class NewBikes : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -297,7 +297,17 @@ namespace MotorBikeShop.Migrations
                 values: new object[,]
                 {
                     { 1, "Honda", null, "https://cloudfront-us-east-1.images.arcpublishing.com/octane/K25WVPRMCVEDZJ7ZJK4BWE374Y.jpg", "CBR600RR", 12000m, 2022 },
-                    { 2, "Yamaha", null, "https://ultimatemotorcycling.com/wp-content/uploads/2022/08/2023-yamaha-yz125x-first-look-gncc-cross-country-racing-two-stroke-motorcycle-dirt-bike-1.jpg", "YZ125", 18000m, 2023 }
+                    { 2, "Yamaha", null, "https://ultimatemotorcycling.com/wp-content/uploads/2022/08/2023-yamaha-yz125x-first-look-gncc-cross-country-racing-two-stroke-motorcycle-dirt-bike-1.jpg", "YZ125", 18000m, 2023 },
+                    { 3, "Kawasaki", null, "https://www.cycleworld.com/resizer/hDgZ3RY9ecoWZYR-r5gIyTpp8JE=/arc-photo-octane/arc3-prod/public/HS6BF7FJD5EZHNW64BX4VKHCL4.jpg", "Ninja ZX-6R", 13000m, 2023 },
+                    { 4, "Ducati", null, "https://images5.1000ps.net/b-f_W3011628-neue-ducati-panigale-v4-2025-638575009620977741.jpg?format=webp&quality=80&scale=both&width=2816&height=1584&mode=crop", "Panigale V4", 25000m, 2024 },
+                    { 5, "Suzuki", null, "https://iconicmotorbikeauctions.com/wp-content/uploads/2022/08/Suzuki-GSX-R750-Front-Right-Featured.jpg", "GSX-R750", 11000m, 2022 },
+                    { 6, "BMW", null, "https://bmw.europe-moto.com/img/cms/s1000rrv1.jpg", "S1000RR", 22000m, 2023 },
+                    { 7, "KTM", null, "https://superbikestore.in/cdn/shop/products/16381CJ520_RC-390_2017_R77_3_4_SS_SS_CF_1Gray_2048x2048_a227f7c6-bfe0-40fa-80d1-c083fdfeecaa.jpg?v=1577786021", "RC 390", 7000m, 2023 },
+                    { 8, "Honda", null, "https://powersportsbusiness.com/wp-content/uploads/2022/06/23-Honda-CRF450R-50th_Location-2a.jpg", "CRF450R", 9500m, 2023 },
+                    { 9, "Yamaha", null, "https://motocrossactionmag.com/wp-content/uploads/2023/02/YZ450-front-angle.jpg", "YZ450F", 9800m, 2024 },
+                    { 10, "Kawasaki", null, "https://hudsonmotorcycles.com/wp-content/uploads/2024/11/IMG_2362.jpg", "KX250", 8200m, 2023 },
+                    { 11, "KTM", null, "https://images5.1000ps.net/images_bikekat/2025/1-KTM/222-300_EXC/007-638550785727500522-ktm-300-exc.jpg?width=920&height=571&mode=crop&scale=both&format=webp", "EXC 300", 10500m, 2024 },
+                    { 12, "Husqvarna", null, "https://i.ytimg.com/vi/RbnfQW3TBpo/maxresdefault.jpg", "TE 300i", 11000m, 2023 }
                 });
 
             migrationBuilder.InsertData(

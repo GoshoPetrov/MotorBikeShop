@@ -259,6 +259,96 @@ namespace MotorBikeShop.Migrations
                             Name = "YZ125",
                             Price = 18000m,
                             Year = 2023
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Brand = "Kawasaki",
+                            ImageUrl = "https://www.cycleworld.com/resizer/hDgZ3RY9ecoWZYR-r5gIyTpp8JE=/arc-photo-octane/arc3-prod/public/HS6BF7FJD5EZHNW64BX4VKHCL4.jpg",
+                            Name = "Ninja ZX-6R",
+                            Price = 13000m,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Brand = "Ducati",
+                            ImageUrl = "https://images5.1000ps.net/b-f_W3011628-neue-ducati-panigale-v4-2025-638575009620977741.jpg?format=webp&quality=80&scale=both&width=2816&height=1584&mode=crop",
+                            Name = "Panigale V4",
+                            Price = 25000m,
+                            Year = 2024
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Brand = "Suzuki",
+                            ImageUrl = "https://iconicmotorbikeauctions.com/wp-content/uploads/2022/08/Suzuki-GSX-R750-Front-Right-Featured.jpg",
+                            Name = "GSX-R750",
+                            Price = 11000m,
+                            Year = 2022
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Brand = "BMW",
+                            ImageUrl = "https://bmw.europe-moto.com/img/cms/s1000rrv1.jpg",
+                            Name = "S1000RR",
+                            Price = 22000m,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Brand = "KTM",
+                            ImageUrl = "https://superbikestore.in/cdn/shop/products/16381CJ520_RC-390_2017_R77_3_4_SS_SS_CF_1Gray_2048x2048_a227f7c6-bfe0-40fa-80d1-c083fdfeecaa.jpg?v=1577786021",
+                            Name = "RC 390",
+                            Price = 7000m,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Brand = "Honda",
+                            ImageUrl = "https://powersportsbusiness.com/wp-content/uploads/2022/06/23-Honda-CRF450R-50th_Location-2a.jpg",
+                            Name = "CRF450R",
+                            Price = 9500m,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Brand = "Yamaha",
+                            ImageUrl = "https://motocrossactionmag.com/wp-content/uploads/2023/02/YZ450-front-angle.jpg",
+                            Name = "YZ450F",
+                            Price = 9800m,
+                            Year = 2024
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Brand = "Kawasaki",
+                            ImageUrl = "https://hudsonmotorcycles.com/wp-content/uploads/2024/11/IMG_2362.jpg",
+                            Name = "KX250",
+                            Price = 8200m,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Brand = "KTM",
+                            ImageUrl = "https://images5.1000ps.net/images_bikekat/2025/1-KTM/222-300_EXC/007-638550785727500522-ktm-300-exc.jpg?width=920&height=571&mode=crop&scale=both&format=webp",
+                            Name = "EXC 300",
+                            Price = 10500m,
+                            Year = 2024
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Brand = "Husqvarna",
+                            ImageUrl = "https://i.ytimg.com/vi/RbnfQW3TBpo/maxresdefault.jpg",
+                            Name = "TE 300i",
+                            Price = 11000m,
+                            Year = 2023
                         });
                 });
 
