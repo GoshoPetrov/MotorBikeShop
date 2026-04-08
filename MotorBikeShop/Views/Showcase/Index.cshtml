@@ -2,6 +2,15 @@
 
 <h2>Bike Showcase</h2>
 
+<form asp-action="Index" method="get">
+    <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
+           placeholder="Search by bike name..." />
+    <button type="submit" class="btn btn-primary">Search</button>
+    <a asp-action="Index" class="btn btn-secondary">Clear</a>
+</form>
+
+
+
 <div class="row">
     @foreach (var bike in Model)
     {

@@ -14,10 +14,19 @@ public class ShowcaseController : Controller
     }
 
     // GET: Showcase
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchString)
     {
-        var bikes = await _context.BikeModels.ToListAsync();
-        return View(bikes);
+        var bikes = from b in _context.BikeModels
+                    select b;
+
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            bikes = bikes.Where(b =>
+    b.Name.ToLower().Contains(searchString.ToLower()) ||
+    b.Brand.ToLower().Contains(searchString.ToLower()));
+        }
+
+        return View(await bikes.ToListAsync());
     }
 
     // GET: Showcase/Details/5
