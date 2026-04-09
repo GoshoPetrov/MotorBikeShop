@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MotorBikeShop.Migrations
 {
     /// <inheritdoc />
-    public partial class NewBikes : Migration
+    public partial class InventorySeed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -316,7 +316,17 @@ namespace MotorBikeShop.Migrations
                 values: new object[,]
                 {
                     { 1, 1, 5 },
-                    { 2, 2, 3 }
+                    { 2, 2, 3 },
+                    { 3, 3, 4 },
+                    { 4, 4, 2 },
+                    { 5, 5, 6 },
+                    { 6, 6, 3 },
+                    { 7, 7, 5 },
+                    { 8, 8, 7 },
+                    { 9, 9, 4 },
+                    { 10, 10, 6 },
+                    { 11, 11, 2 },
+                    { 12, 12, 3 }
                 });
 
             migrationBuilder.CreateIndex(

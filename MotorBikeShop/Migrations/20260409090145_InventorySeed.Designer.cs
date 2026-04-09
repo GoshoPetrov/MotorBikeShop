@@ -12,8 +12,8 @@ using MotorBikeShop.Data;
 namespace MotorBikeShop.Migrations
 {
     [DbContext(typeof(MotorBikeShopContext))]
-    [Migration("20260407090611_NewBikes")]
-    partial class NewBikes
+    [Migration("20260409090145_InventorySeed")]
+    partial class InventorySeed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -387,6 +387,66 @@ namespace MotorBikeShop.Migrations
                         {
                             Id = 2,
                             BikeModelId = 2,
+                            Quantity = 3
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BikeModelId = 3,
+                            Quantity = 4
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BikeModelId = 4,
+                            Quantity = 2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BikeModelId = 5,
+                            Quantity = 6
+                        },
+                        new
+                        {
+                            Id = 6,
+                            BikeModelId = 6,
+                            Quantity = 3
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BikeModelId = 7,
+                            Quantity = 5
+                        },
+                        new
+                        {
+                            Id = 8,
+                            BikeModelId = 8,
+                            Quantity = 7
+                        },
+                        new
+                        {
+                            Id = 9,
+                            BikeModelId = 9,
+                            Quantity = 4
+                        },
+                        new
+                        {
+                            Id = 10,
+                            BikeModelId = 10,
+                            Quantity = 6
+                        },
+                        new
+                        {
+                            Id = 11,
+                            BikeModelId = 11,
+                            Quantity = 2
+                        },
+                        new
+                        {
+                            Id = 12,
+                            BikeModelId = 12,
                             Quantity = 3
                         });
                 });

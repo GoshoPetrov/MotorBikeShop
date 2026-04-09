@@ -1,0 +1,23 @@
+﻿<h2>Checkout</h2>
+
+<form asp-action="Confirm" method="post">
+    <div class="form-group">
+        <label>Full Name</label>
+        <input name="fullName" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Address</label>
+        <input name="address" class="form-control" required />
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success">
+        Pay Now
+    </button>
+
+    <a asp-action="Cancel" class="btn btn-danger">
+        Cancel
+    </a>
+</form>

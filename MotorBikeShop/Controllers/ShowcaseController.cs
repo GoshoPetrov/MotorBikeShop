@@ -16,8 +16,9 @@ public class ShowcaseController : Controller
     // GET: Showcase
     public async Task<IActionResult> Index(string searchString)
     {
-        var bikes = from b in _context.BikeModels
-                    select b;
+        var bikes = _context.BikeModels
+            .Include(b => b.Inventory) // ✅ THIS FIXES IT
+            .AsQueryable();
 
         if (!string.IsNullOrEmpty(searchString))
         {
@@ -35,6 +36,7 @@ public class ShowcaseController : Controller
         if (id == null) return NotFound();
 
         var bike = await _context.BikeModels
+            .Include(b => b.Inventory) // ✅ IMPORTANT
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (bike == null) return NotFound();

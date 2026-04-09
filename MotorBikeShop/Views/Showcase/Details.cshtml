@@ -14,3 +14,20 @@
 </div>
 
 <a asp-action="Index" class="btn btn-secondary">Back to Showcase</a>
+
+<form asp-controller="Basket" asp-action="Add" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="bikeModelId" value="@Model.Id" />
+    @if (Model.Inventory.Quantity > 0)
+    {
+        <form asp-controller="Basket" asp-action="Add" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="bikeModelId" value="@Model.Id" />
+            <button class="btn btn-success">Add to Basket</button>
+        </form>
+    }
+    else
+    {
+        <button class="btn btn-secondary" disabled>Out of Stock</button>
+    }
+</form>

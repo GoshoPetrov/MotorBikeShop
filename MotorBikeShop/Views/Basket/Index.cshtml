@@ -1,0 +1,61 @@
+﻿@model Basket
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>Your Basket</h2>
+    <a asp-controller="Showcase" asp-action="Index" class="btn btn-warning">
+        Back to Showcase
+    </a>
+</div>
+
+@if (Model == null || Model.Items == null || !Model.Items.Any())
+{
+    <p>Your basket is empty.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Bike</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.BikeModel.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.BikeModel.Price</td>
+                    <td>
+                        <form asp-action="Decrease" method="post" style="display:inline;">
+                            <input type="hidden" name="itemId" value="@item.Id" />
+                            <button class="btn btn-warning btn-sm">-</button>
+                        </form>
+
+                        <span style="margin: 0 10px;">@item.Quantity</span>
+
+                        <form asp-action="Increase" method="post" style="display:inline;">
+                            <input type="hidden" name="itemId" value="@item.Id" />
+                            <button class="btn btn-success btn-sm">+</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p>
+        <strong>Total: </strong>
+        @Model.Items.Sum(i => i.Quantity * i.BikeModel.Price)
+    </p>
+
+    @if (Model != null && Model.Items.Any())
+    {
+        <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary">
+            Proceed with Purchase
+        </a>
+    }
+}

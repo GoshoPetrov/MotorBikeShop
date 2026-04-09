@@ -1,6 +1,12 @@
 ﻿@model IEnumerable<MotorBikeShop.Areas.Identity.Data.Entities.BikeModel>
 
-<h2>Bike Showcase</h2>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>Bike Showcase</h2>
+
+    <a asp-controller="Basket" asp-action="Index" class="btn btn-warning">
+        View Basket
+    </a>
+</div>
 
 <form asp-action="Index" method="get">
     <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
@@ -32,8 +38,23 @@
                        class="btn btn-primary">
                         View Details
                     </a>
+
+                    <form asp-controller="Basket" asp-action="Add" method="post">
+                        <input type="hidden" name="bikeModelId" value="@bike.Id" />
+                        @if (bike.Inventory != null && bike.Inventory.Quantity > 0)
+                        {
+                            <button class="btn btn-success">Add to Basket</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary" disabled>Out of Stock</button>
+                        }
+                    </form>
+                    <p><strong>In Stock:</strong> @bike.Inventory.Quantity</p>
                 </div>
             </div>
         </div>
+
+
     }
 </div>

@@ -175,20 +175,21 @@ public class MotorBikeShopContext : IdentityDbContext<MotorBikeShopUser>
          );
 
         // INVENTORY
+
         modelBuilder.Entity<Inventory>().HasData(
-            new Inventory
-            {
-                Id = 1,
-                BikeModelId = 1,
-                Quantity = 5
-            },
-            new Inventory
-            {
-                Id = 2,
-                BikeModelId = 2,
-                Quantity = 3
-            }
-        );
+    new Inventory { Id = 1, BikeModelId = 1, Quantity = 5 },
+    new Inventory { Id = 2, BikeModelId = 2, Quantity = 3 },
+    new Inventory { Id = 3, BikeModelId = 3, Quantity = 4 },
+    new Inventory { Id = 4, BikeModelId = 4, Quantity = 2 },
+    new Inventory { Id = 5, BikeModelId = 5, Quantity = 6 },
+    new Inventory { Id = 6, BikeModelId = 6, Quantity = 3 },
+    new Inventory { Id = 7, BikeModelId = 7, Quantity = 5 },
+    new Inventory { Id = 8, BikeModelId = 8, Quantity = 7 },
+    new Inventory { Id = 9, BikeModelId = 9, Quantity = 4 },
+    new Inventory { Id = 10, BikeModelId = 10, Quantity = 6 },
+    new Inventory { Id = 11, BikeModelId = 11, Quantity = 2 },
+    new Inventory { Id = 12, BikeModelId = 12, Quantity = 3 }
+);
 
     }
 }

@@ -30,13 +30,17 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-link text-dark"><a class="nav-link text-dark" asp-controller="UserPortal" asp-action="Index">User Section</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="UserPortal" asp-action="Index">User Section</a>
+                            </li>
 
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="AdminPortal" asp-action="Index">Admin Section</a></li>
                             }
                         }
+
+
 
                     </ul>
                 </div>
