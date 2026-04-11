@@ -1,17 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MotorBikeShop.Data;
 
 [Authorize(Roles = "Admin")]
 public class AdminPortalController : Controller
 {
-    public IActionResult Index()
+    private readonly MotorBikeShopContext _context;
+
+    public AdminPortalController(MotorBikeShopContext context)
     {
-        return View();
+        _context = context;
     }
 
-    // Example: manage bikes
-    public IActionResult ManageBikes()
+    // LIST ALL BIKES (ADMIN VIEW)
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var bikes = await _context.BikeModels
+            .Include(b => b.Inventory) // include stock
+            .ToListAsync();
+
+        return View(bikes);
     }
 }

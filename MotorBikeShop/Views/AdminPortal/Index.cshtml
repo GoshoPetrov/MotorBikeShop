@@ -1,6 +1,36 @@
-﻿<h2>Admin Portal</h2>
-<p>Welcome, @User.Identity.Name!</p>
+﻿@model IEnumerable<MotorBikeShop.Areas.Identity.Data.Entities.BikeModel>
 
-<ul>
-    <li><a asp-controller="AdminPortal" asp-action="ManageBikes">Manage Bikes</a></li>
-</ul>
+<h2>Admin - Bike Management</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Year</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bike in Model)
+        {
+            <tr>
+                <td>@bike.Id</td>
+                <td>@bike.Name</td>
+                <td>@bike.Brand</td>
+                <td>@bike.Year</td>
+                <td>@bike.Price</td>
+                <td>
+                    @(bike.Inventory != null ? bike.Inventory.Quantity : 0)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@bike.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@bike.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
