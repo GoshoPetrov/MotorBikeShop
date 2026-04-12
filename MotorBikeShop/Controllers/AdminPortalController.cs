@@ -2,23 +2,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotorBikeShop.Data;
+using MotorBikeShop.Services;
 
 [Authorize(Roles = "Admin")]
 public class AdminPortalController : Controller
 {
-    private readonly MotorBikeShopContext _context;
+    private readonly IShopService _shopService;
 
-    public AdminPortalController(MotorBikeShopContext context)
+    public AdminPortalController(IShopService shopService)
     {
-        _context = context;
+        _shopService = shopService;
     }
 
     // LIST ALL BIKES (ADMIN VIEW)
     public async Task<IActionResult> Index()
     {
-        var bikes = await _context.BikeModels
-            .Include(b => b.Inventory) // include stock
-            .ToListAsync();
+
+        var bikes = await _shopService.BikeInventory();
 
         return View(bikes);
     }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MotorBikeShop.Areas.Identity.Data.Entities.BikeModel>
+﻿@model IEnumerable<BikeViewModel>
 
 <h2>Admin - Bike Management</h2>
 
@@ -24,7 +24,7 @@
                 <td>@bike.Year</td>
                 <td>@bike.Price</td>
                 <td>
-                    @(bike.Inventory != null ? bike.Inventory.Quantity : 0)
+                    @(bike.InventoryQuantity != null ? bike.InventoryQuantity : 0)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@bike.Id">Edit</a> |

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MotorBikeShop.Areas.Identity.Data;
 using MotorBikeShop.Data;
+using MotorBikeShop.Services;
 namespace MotorBikeShop
 {
     public class Program
@@ -10,6 +12,8 @@ namespace MotorBikeShop
         {
             var builder = WebApplication.CreateBuilder(args);
             var connectionString = builder.Configuration.GetConnectionString("MotorBikeShopContextConnection") ?? throw new InvalidOperationException("Connection string 'MotorBikeShopContextConnection' not found.");
+
+            builder.Services.AddScoped<IShopService, ShopService>();
 
             builder.Services.AddDbContext<MotorBikeShopContext>(options => options.UseSqlServer(connectionString));
 
