@@ -2,44 +2,35 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using MotorBikeShop.Data;
+using MotorBikeShop.Services;
 
 [Authorize] // only logged-in users can see bikes
 public class ShowcaseController : Controller
 {
-    private readonly MotorBikeShopContext _context;
+    private readonly IShopService _shopService;
 
-    public ShowcaseController(MotorBikeShopContext context)
+    public ShowcaseController(IShopService shopService)
     {
-        _context = context;
+        _shopService = shopService;
     }
 
     // GET: Showcase
     public async Task<IActionResult> Index(string searchString)
     {
-        var bikes = _context.BikeModels
-            .Include(b => b.Inventory) // ✅ THIS FIXES IT
-            .AsQueryable();
+        var bikes = await _shopService.GetShowcase(searchString);
 
-        if (!string.IsNullOrEmpty(searchString))
-        {
-            bikes = bikes.Where(b =>
-    b.Name.ToLower().Contains(searchString.ToLower()) ||
-    b.Brand.ToLower().Contains(searchString.ToLower()));
-        }
-
-        return View(await bikes.ToListAsync());
+        return View(bikes);
     }
 
     // GET: Showcase/Details/5
-    public async Task<IActionResult> Details(int? id)
+    public async Task<IActionResult> Details(int id)
     {
-        if (id == null) return NotFound();
+        var bike = await _shopService.GetShowcaseDetail(id);
 
-        var bike = await _context.BikeModels
-            .Include(b => b.Inventory) // ✅ IMPORTANT
-            .FirstOrDefaultAsync(b => b.Id == id);
-
-        if (bike == null) return NotFound();
+        if(bike == null)
+        {
+            return NotFound();
+        }
 
         return View(bike);
     }

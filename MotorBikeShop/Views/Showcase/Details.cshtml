@@ -1,4 +1,4 @@
-﻿@model MotorBikeShop.Areas.Identity.Data.Entities.BikeModel
+﻿@model BikeViewModel
 
 <h2>@Model.Name</h2>
 
@@ -18,7 +18,7 @@
 <form asp-controller="Basket" asp-action="Add" method="post">
     @Html.AntiForgeryToken()
     <input type="hidden" name="bikeModelId" value="@Model.Id" />
-    @if (Model.Inventory.Quantity > 0)
+    @if (Model.InventoryQuantity > 0)
     {
         <form asp-controller="Basket" asp-action="Add" method="post">
             @Html.AntiForgeryToken()

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MotorBikeShop.Areas.Identity.Data.Entities.BikeModel>
+﻿@model IEnumerable<BikeViewModel>
 
 <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2>Bike Showcase</h2>
@@ -41,7 +41,7 @@
 
                     <form asp-controller="Basket" asp-action="Add" method="post">
                         <input type="hidden" name="bikeModelId" value="@bike.Id" />
-                        @if (bike.Inventory != null && bike.Inventory.Quantity > 0)
+                        @if (bike.InventoryQuantity != null && bike.InventoryQuantity > 0)
                         {
                             <button class="btn btn-success">Add to Basket</button>
                         }
@@ -50,7 +50,7 @@
                             <button class="btn btn-secondary" disabled>Out of Stock</button>
                         }
                     </form>
-                    <p><strong>In Stock:</strong> @bike.Inventory.Quantity</p>
+                    <p><strong>In Stock:</strong> @bike.InventoryQuantity</p>
                 </div>
             </div>
         </div>
