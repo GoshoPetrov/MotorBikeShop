@@ -18,8 +18,28 @@ namespace MotorBikeShop.Services
         Task<List<BikeViewModel>> BikeInventory();
     }
 
-    public class ShopService: IShopService
+
+    public class ShopService : IShopService
     {
+        private BasketItemViewModel ToViewModel(BasketItem db)
+        {
+            return new BasketItemViewModel()
+            {
+                Id = db.Id,
+                BikeModelId = db.BikeModelId,
+                Quantity = db.Quantity
+
+            };
+        }
+        private BasketViewModel ToViewModel(Basket db)
+        {
+            return new BasketViewModel()
+            {
+                Id = db.Id,
+                Items = db.Items.Select(ToViewModel).ToArray()
+            };
+        }
+
         private BikeViewModel ToViewModel(BikeModel db)
         {
             return new BikeViewModel()
@@ -37,9 +57,58 @@ namespace MotorBikeShop.Services
 
         private readonly MotorBikeShopContext _context;
 
-        public ShopService(MotorBikeShopContext context)
+        private readonly ICurrentUserService _currentUser;
+
+        public ShopService(MotorBikeShopContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
+        }
+
+        public async Task<BasketItemViewModel> RemoveFromBasket(int itemId)
+        {
+            var item = await _context.BasketItems.FindAsync(itemId);
+
+            if (item != null)
+            {
+                _context.BasketItems.Remove(item);
+                await _context.SaveChangesAsync();
+            }
+
+            return ToViewModel(item);
+        }
+
+        private string GetUserId()
+        {
+            var userId = _currentUser.UserId;
+
+            if(userId == null)
+            {
+                throw new Exception("Login to view your basket.");
+            }
+            return userId;
+        }
+
+        public async Task<BasketViewModel> GetBasket()
+        {
+            var userId = GetUserId();
+
+            var basket = await _context.Baskets
+                .Include(b => b.Items)
+                .ThenInclude(i => i.BikeModel)
+                .FirstOrDefaultAsync(b => b.UserId == userId);
+
+            if (basket != null) return ToViewModel(basket);
+
+            var newBasket = new Basket()
+            {
+                UserId = userId
+            };
+
+            _context.Baskets.Add(newBasket);
+            _context.SaveChanges();
+            return ToViewModel(newBasket);
+            
         }
 
         public async Task<BikeViewModel> UpdateBike(BikeViewModel bikeViewModel)
@@ -48,7 +117,7 @@ namespace MotorBikeShop.Services
             var bike = await _context.BikeModels
                 .FirstOrDefaultAsync(b => b.Id == bikeViewModel.Id);
 
-            if(bike == null)
+            if (bike == null)
             {
                 throw new Exception($"Bike with id: {bikeViewModel.Id} was not found.");
             }
@@ -101,7 +170,7 @@ namespace MotorBikeShop.Services
         {
 
             var bike = await _context.BikeModels
-                .Include(b => b.Inventory) 
+                .Include(b => b.Inventory)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (bike == null) return null;

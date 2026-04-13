@@ -24,6 +24,10 @@ namespace MotorBikeShop
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())

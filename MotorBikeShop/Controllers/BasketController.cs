@@ -3,15 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using MotorBikeShop.Data;
+using MotorBikeShop.Services;
+using AspNetCoreGeneratedDocument;
 
 [Authorize]
 public class BasketController : Controller
 {
-    private readonly MotorBikeShopContext _context;
 
-    public BasketController(MotorBikeShopContext context)
+    private readonly ShopService _shopService;
+    public BasketController(ShopService shopService)
     {
-        _context = context;
+        _shopService = shopService;
     }
 
     // GET: Basket
@@ -19,10 +21,7 @@ public class BasketController : Controller
     {
         var userId = GetUserId();
 
-        var basket = await _context.Baskets
-            .Include(b => b.Items)
-            .ThenInclude(i => i.BikeModel)
-            .FirstOrDefaultAsync(b => b.UserId == userId);
+        var basket = await _shopService.GetBasket();
 
         return View(basket);
     }
@@ -32,7 +31,7 @@ public class BasketController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(int bikeModelId)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = GetUserId();
 
         // 1. Get inventory for the bike
         var inventory = await _context.Inventories
