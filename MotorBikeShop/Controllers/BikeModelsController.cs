@@ -2,29 +2,31 @@
 using Microsoft.EntityFrameworkCore;
 using MotorBikeShop.Areas.Identity.Data.Entities;
 using MotorBikeShop.Data;
+using MotorBikeShop.Models;
+using MotorBikeShop.Services;
 
 public class BikeModelsController : Controller
 {
-    private readonly MotorBikeShopContext _context;
+    private readonly ShopService _shopService;
 
-    public BikeModelsController(MotorBikeShopContext context)
+    public BikeModelsController(ShopService shopService)
     {
-        _context = context;
+        _shopService = shopService;
     }
 
     // GET: BikeModels
     public async Task<IActionResult> Index()
     {
-        var bikes = await _context.BikeModels.ToListAsync();
-        return View(bikes ?? new List<BikeModel>());
+        var bikes = await _shopService.GetBikeModelIndex();
+        return View(bikes);
     }
 
     // GET: BikeModels/Details/5
-    public async Task<IActionResult> Details(int? id)
+    public async Task<IActionResult> Details(int id)
     {
         if (id == null) return NotFound();
 
-        var bike = await _context.BikeModels.FirstOrDefaultAsync(m => m.Id == id);
+        var bike = await _shopService.GetBikeModelDetails(id);
 
         if (bike == null) return NotFound();
 
@@ -40,23 +42,21 @@ public class BikeModelsController : Controller
     // POST: BikeModels/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(BikeModel bikeModel)
+    public async Task<IActionResult> Create(BikeViewModel bikeModel)
     {
         if (ModelState.IsValid)
         {
-            _context.Add(bikeModel);
-            await _context.SaveChangesAsync();
+            await _shopService.UpdateBike(bikeModel);
             return RedirectToAction(nameof(Index));
         }
         return RedirectToAction("SomeOtherAction", "SomeController");
     }
 
     // GET: BikeModels/Edit/5
-    public async Task<IActionResult> Edit(int? id)
+    public async Task<IActionResult> Edit(int id)
     {
-        if (id == null) return NotFound();
 
-        var bike = await _context.BikeModels.FindAsync(id);
+        var bike = await _shopService.GetBike(id);
         if (bike == null) return NotFound();
 
         return View(bike);
@@ -65,25 +65,23 @@ public class BikeModelsController : Controller
     // POST: BikeModels/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, BikeModel bikeModel)
+    public async Task<IActionResult> Edit(int id, BikeViewModel bikeModel)
     {
         if (id != bikeModel.Id) return NotFound();
 
         if (ModelState.IsValid)
         {
-            _context.Update(bikeModel);
-            await _context.SaveChangesAsync();
+            await _shopService.UpdateBike(bikeModel);
             return RedirectToAction(nameof(Index));
         }
         return View(bikeModel);
     }
 
     // GET: BikeModels/Delete/5
-    public async Task<IActionResult> Delete(int? id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (id == null) return NotFound();
 
-        var bike = await _context.BikeModels.FirstOrDefaultAsync(m => m.Id == id);
+        var bike = await _shopService.GetBike(id);
         if (bike == null) return NotFound();
 
         return View(bike);
@@ -94,12 +92,7 @@ public class BikeModelsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var bike = await _context.BikeModels.FindAsync(id);
-        if (bike != null)
-        {
-            _context.BikeModels.Remove(bike);
-            await _context.SaveChangesAsync();
-        }
+        var bike = await _shopService.DeleteBike(id);
 
         return RedirectToAction(nameof(Index));
     }
