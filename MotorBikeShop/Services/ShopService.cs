@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using MotorBikeShop.Areas.Identity.Data.Entities;
 using MotorBikeShop.Data;
 using MotorBikeShop.Models;
+using System.Security.Claims;
 
 namespace MotorBikeShop.Services
 {
     public interface IShopService
     {
+        Task ConfirmPurchase();
         Task IncreaseBasketItemQuantity(int itemId, int delta = 1);
         Task<BasketItemViewModel> RemoveFromBasket(int itemId);
         Task<BasketViewModel> GetBasket();
@@ -72,6 +74,74 @@ namespace MotorBikeShop.Services
             _currentUser = currentUser;
         }
 
+        public async Task ConfirmPurchase()
+        {
+            var userId = GetUserId();
+
+            // 1. Get basket with items and bikes
+            var basket = await _context.Baskets
+                .Include(b => b.Items)
+                .ThenInclude(i => i.BikeModel)
+                .FirstOrDefaultAsync(b => b.UserId == userId);
+
+            if (basket == null || !basket.Items.Any())
+            {
+                return;
+            }
+
+            // 2. VALIDATE STOCK
+            foreach (var item in basket.Items)
+            {
+                var inventory = await _context.Inventories
+                    .FirstOrDefaultAsync(i => i.BikeModelId == item.BikeModelId);
+
+                if (inventory == null || inventory.Quantity < item.Quantity)
+                {
+                    throw new OutOfStockExeption($"Not enough stock for {item.BikeModel.Name}");
+                }
+            }
+
+            // 3. CREATE ORDER (Vent)
+            var vent = new Vent
+            {
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                TotalPrice = basket.Items.Sum(i => i.Quantity * i.BikeModel.Price)
+            };
+
+            _context.Vents.Add(vent);
+            await _context.SaveChangesAsync();
+
+            // 4. CREATE VENT ITEMS
+            foreach (var item in basket.Items)
+            {
+                _context.VentItems.Add(new VentItem
+                {
+                    VentId = vent.Id,
+                    BikeModelId = item.BikeModelId,
+                    Quantity = item.Quantity,
+                    Price = item.BikeModel.Price
+                });
+            }
+
+            // 5. REDUCE INVENTORY
+            foreach (var item in basket.Items)
+            {
+                var inventory = await _context.Inventories
+                    .FirstOrDefaultAsync(i => i.BikeModelId == item.BikeModelId);
+
+                if (inventory != null)
+                {
+                    inventory.Quantity -= item.Quantity;
+                }
+            }
+
+            // 6. CLEAR BASKET
+            _context.BasketItems.RemoveRange(basket.Items);
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task IncreaseBasketItemQuantity(int itemId, int delta = 1)
         {
             // 1. Get basket item
@@ -95,7 +165,7 @@ namespace MotorBikeShop.Services
 
             // 3. Check stock limit
             if (item.Quantity + delta >= 0 
-                && item.Quantity + delta < inventory.Quantity)
+                && item.Quantity + delta <= inventory.Quantity)
             {
                 item.Quantity += delta;
 

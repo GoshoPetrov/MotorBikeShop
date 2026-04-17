@@ -34,7 +34,7 @@ public class BasketController : Controller
             await _shopService.AddItemToBasket(bikeModelId); 
             
         }
-        catch (OutOfStockExeption ex)
+        catch (ShopException ex)
         {
             TempData["Error"] = ex.Message;
         }

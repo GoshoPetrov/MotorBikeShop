@@ -7,9 +7,9 @@ using MotorBikeShop.Services;
 
 public class BikeModelsController : Controller
 {
-    private readonly ShopService _shopService;
+    private readonly IShopService _shopService;
 
-    public BikeModelsController(ShopService shopService)
+    public BikeModelsController(IShopService shopService)
     {
         _shopService = shopService;
     }
