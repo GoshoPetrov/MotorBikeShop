@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using MotorBikeShop.Data;
 using MotorBikeShop.Services;
-using AspNetCoreGeneratedDocument;
+
 
 [Authorize]
 public class BasketController : Controller
 {
 
-    private readonly ShopService _shopService;
-    public BasketController(ShopService shopService)
+    private readonly IShopService _shopService;
+    public BasketController(IShopService shopService)
     {
         _shopService = shopService;
     }
@@ -31,78 +29,29 @@ public class BasketController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(int bikeModelId)
     {
-        var userId = GetUserId();
-
-        // 1. Get inventory for the bike
-        var inventory = await _context.Inventories
-            .FirstOrDefaultAsync(i => i.BikeModelId == bikeModelId);
-
-        // ❌ If no stock or bike doesn't exist
-        if (inventory == null || inventory.Quantity <= 0)
+        try
         {
-            TempData["Error"] = "This bike is out of stock.";
-            return RedirectToAction("Index", "Showcase");
+            await _shopService.AddItemToBasket(bikeModelId); 
+            
+        }
+        catch (OutOfStockExeption ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception)
+        {
+            //TODO: log the error somewhere
+            TempData["Error"] = "Something went wrong. Try again later";
         }
 
-        // 2. Get or create basket
-        var basket = await _context.Baskets
-            .Include(b => b.Items)
-            .FirstOrDefaultAsync(b => b.UserId == userId);
-
-        if (basket == null)
-        {
-            basket = new Basket
-            {
-                UserId = userId,
-                Items = new List<BasketItem>()
-            };
-
-            _context.Baskets.Add(basket);
-            await _context.SaveChangesAsync();
-        }
-
-        // 3. Check if item already exists
-        var existingItem = basket.Items
-            .FirstOrDefault(i => i.BikeModelId == bikeModelId);
-
-        if (existingItem != null)
-        {
-            // ✅ Only increase if stock allows
-            if (existingItem.Quantity < inventory.Quantity)
-            {
-                existingItem.Quantity++;
-            }
-            else
-            {
-                TempData["Error"] = "Cannot add more than available stock.";
-            }
-        }
-        else
-        {
-            // ✅ Add new item
-            basket.Items.Add(new BasketItem
-            {
-                BikeModelId = bikeModelId,
-                Quantity = 1
-            });
-        }
-
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction("Index", "Showcase");
+       return RedirectToAction("Index", "Showcase");
     }
 
     // POST: Remove item
     [HttpPost]
     public async Task<IActionResult> Remove(int itemId)
     {
-        var item = await _context.BasketItems.FindAsync(itemId);
-
-        if (item != null)
-        {
-            _context.BasketItems.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        var item = await _shopService.RemoveFromBasket(itemId);
 
         return RedirectToAction(nameof(Index));
     }
@@ -117,56 +66,36 @@ public class BasketController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Increase(int itemId)
     {
-        // 1. Get basket item
-        var item = await _context.BasketItems
-            .FirstOrDefaultAsync(i => i.Id == itemId);
-
-        if (item == null)
+        try
         {
-            return RedirectToAction(nameof(Index));
+            await _shopService.IncreaseBasketItemQuantity(itemId, 1);
         }
-
-        // 2. Get inventory for this bike
-        var inventory = await _context.Inventories
-            .FirstOrDefaultAsync(i => i.BikeModelId == item.BikeModelId);
-
-        if (inventory == null)
+        catch (ShopException ex)
         {
-            TempData["Error"] = "Inventory not found.";
-            return RedirectToAction(nameof(Index));
+            TempData["Error"] = ex.Message;
         }
-
-        // 3. Check stock limit
-        if (item.Quantity < inventory.Quantity)
+        catch (Exception)
         {
-            item.Quantity++;
-            await _context.SaveChangesAsync();
+            TempData["Error"] = "Something went wrong. Try again later";
         }
-        else
-        {
-            TempData["Error"] = "Cannot add more than available stock.";
-        }
-
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     public async Task<IActionResult> Decrease(int itemId)
     {
-        var item = await _context.BasketItems.FindAsync(itemId);
-
-        if (item != null)
+        try
         {
-            item.Quantity--;
-
-            if (item.Quantity <= 0)
-            {
-                _context.BasketItems.Remove(item);
-            }
-
-            await _context.SaveChangesAsync();
+            await _shopService.IncreaseBasketItemQuantity(itemId, -1);
         }
-
+        catch (ShopException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = "Something went wrong. Try again later";
+        }
         return RedirectToAction(nameof(Index));
     }
 }

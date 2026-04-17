@@ -8,6 +8,10 @@ namespace MotorBikeShop.Services
 {
     public interface IShopService
     {
+        Task IncreaseBasketItemQuantity(int itemId, int delta = 1);
+        Task<BasketItemViewModel> RemoveFromBasket(int itemId);
+        Task<BasketViewModel> GetBasket();
+        Task AddItemToBasket(int bikeModelId);
         Task<BikeViewModel> UpdateBike(BikeViewModel bikeViewModel);
         Task<BikeViewModel> GetBike(int id);
         Task<BikeViewModel> DeleteBike(int id);
@@ -27,7 +31,10 @@ namespace MotorBikeShop.Services
             {
                 Id = db.Id,
                 BikeModelId = db.BikeModelId,
-                Quantity = db.Quantity
+                Quantity = db.Quantity,
+                Name = db.BikeModel.Name,
+                Price = db.BikeModel.Price
+
 
             };
         }
@@ -63,6 +70,106 @@ namespace MotorBikeShop.Services
         {
             _context = context;
             _currentUser = currentUser;
+        }
+
+        public async Task IncreaseBasketItemQuantity(int itemId, int delta = 1)
+        {
+            // 1. Get basket item
+            var item = await _context.BasketItems
+                .FirstOrDefaultAsync(i => i.Id == itemId);
+
+            if (item == null)
+            {
+                return;
+            }
+
+            // 2. Get inventory for this bike
+            var inventory = await _context.Inventories
+                .FirstOrDefaultAsync(i => i.BikeModelId == item.BikeModelId);
+
+            if (inventory == null)
+            {
+                throw new InventoryNotFoundException();
+                
+            }
+
+            // 3. Check stock limit
+            if (item.Quantity + delta >= 0 
+                && item.Quantity + delta < inventory.Quantity)
+            {
+                item.Quantity += delta;
+
+                if(item.Quantity == 0)
+                {
+                    _context.BasketItems.Remove(item);
+                }
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new OutOfStockExeption("Cannot add more than available stock.");
+            }
+
+        }
+
+        public async Task AddItemToBasket(int bikeModelId)
+        {
+            var userId = GetUserId();
+
+            // 1. Get inventory for the bike
+            var inventory = await _context.Inventories
+                .FirstOrDefaultAsync(i => i.BikeModelId == bikeModelId);
+
+            // ❌ If no stock or bike doesn't exist
+            if (inventory == null || inventory.Quantity <= 0)
+            {
+                throw new OutOfStockExeption();
+            }
+
+            // 2. Get or create basket
+            var basket = await _context.Baskets
+                .Include(b => b.Items)
+                .FirstOrDefaultAsync(b => b.UserId == userId);
+
+            if (basket == null)
+            {
+                basket = new Basket
+                {
+                    UserId = userId,
+                    Items = new List<BasketItem>()
+                };
+
+                _context.Baskets.Add(basket);
+                await _context.SaveChangesAsync();
+            }
+
+            // 3. Check if item already exists
+            var existingItem = basket.Items
+                .FirstOrDefault(i => i.BikeModelId == bikeModelId);
+
+            if (existingItem != null)
+            {
+                // ✅ Only increase if stock allows
+                if (existingItem.Quantity < inventory.Quantity)
+                {
+                    existingItem.Quantity++;
+                }
+                else
+                {
+                    throw new OutOfStockExeption("Cannot add more.");
+                }
+            }
+            else
+            {
+                // ✅ Add new item
+                basket.Items.Add(new BasketItem
+                {
+                    BikeModelId = bikeModelId,
+                    Quantity = 1
+                });
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<BasketItemViewModel> RemoveFromBasket(int itemId)

@@ -1,4 +1,4 @@
-﻿@model Basket
+﻿@model BasketViewModel
 
 <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2>Your Basket</h2>
@@ -26,9 +26,9 @@ else
             @foreach (var item in Model.Items)
             {
                 <tr>
-                    <td>@item.BikeModel.Name</td>
+                    <td>@item.Name</td>
                     <td>@item.Quantity</td>
-                    <td>@item.BikeModel.Price</td>
+                    <td>@item.Price</td>
                     <td>
                         <form asp-action="Decrease" method="post" style="display:inline;">
                             <input type="hidden" name="itemId" value="@item.Id" />
@@ -49,7 +49,7 @@ else
 
     <p>
         <strong>Total: </strong>
-        @Model.Items.Sum(i => i.Quantity * i.BikeModel.Price)
+        @Model.Items.Sum(i => i.Quantity * i.Price)
     </p>
 
     @if (Model != null && Model.Items.Any())
