@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorBikeShop.Data", "Motor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorBikeShop.Services", "MotorBikeShop.Services\MotorBikeShop.Services.csproj", "{F59709A9-64B6-4EA3-A054-9B2714F757F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorBikeShop.Tests", "MotorBikeShop.Tests\MotorBikeShop.Tests.csproj", "{76465F55-B079-43FD-8EF6-FF6EE636B337}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F59709A9-64B6-4EA3-A054-9B2714F757F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F59709A9-64B6-4EA3-A054-9B2714F757F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F59709A9-64B6-4EA3-A054-9B2714F757F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76465F55-B079-43FD-8EF6-FF6EE636B337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76465F55-B079-43FD-8EF6-FF6EE636B337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76465F55-B079-43FD-8EF6-FF6EE636B337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76465F55-B079-43FD-8EF6-FF6EE636B337}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

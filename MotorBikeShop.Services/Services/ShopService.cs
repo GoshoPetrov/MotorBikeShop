@@ -45,6 +45,7 @@ namespace MotorBikeShop.Services
             return new BasketViewModel()
             {
                 Id = db.Id,
+                UserId = db.UserId,
                 Items = db.Items.Select(ToViewModel).ToArray()
             };
         }
@@ -250,9 +251,10 @@ namespace MotorBikeShop.Services
             {
                 _context.BasketItems.Remove(item);
                 await _context.SaveChangesAsync();
+                return ToViewModel(item);
             }
 
-            return ToViewModel(item);
+            return null;
         }
 
         private string GetUserId()
@@ -318,15 +320,21 @@ namespace MotorBikeShop.Services
             {
                 _context.BikeModels.Remove(bike);
                 await _context.SaveChangesAsync();
+                return ToViewModel(bike);
             }
 
-            return ToViewModel(bike);
+            return null;
+            
         }
 
         public async Task<BikeViewModel?> GetBike(int id)
         {
             var bike = await _context.BikeModels.FirstOrDefaultAsync(m => m.Id == id);
 
+            if(bike == null)
+            {
+                return null;
+            }
             return ToViewModel(bike);
         }
 
