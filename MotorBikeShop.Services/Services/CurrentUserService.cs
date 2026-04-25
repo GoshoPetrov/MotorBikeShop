@@ -1,5 +1,6 @@
 ﻿namespace MotorBikeShop.Services
 {
+    using Microsoft.AspNetCore.Http;
     using System.Security.Claims;
 
     public interface ICurrentUserService
