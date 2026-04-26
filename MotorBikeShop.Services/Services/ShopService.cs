@@ -22,6 +22,10 @@ namespace MotorBikeShop.Services
         Task<BikeViewModel> GetShowcaseDetail(int id);
         Task<List<BikeViewModel>> GetShowcase(string searchString);
         Task<List<BikeViewModel>> BikeInventory();
+
+
+        Task<string> ExportBikes();
+        Task<bool> ImportBikes(string json);
     }
 
 
@@ -388,6 +392,78 @@ namespace MotorBikeShop.Services
             var result = bikes.Select(ToViewModel).ToList();
 
             return result;
+        }
+
+        public async Task<string> ExportBikes()
+        {
+            var bikes = await BikeInventory();
+
+            return System.Text.Json.JsonSerializer.Serialize(bikes, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+        }
+
+        public async Task<bool> ImportBikes(string json)
+        {
+            try
+            {
+                var bikes = System.Text.Json.JsonSerializer.Deserialize<List<BikeViewModel>>(json);
+
+                if (bikes == null) return false;
+
+                foreach (var bike in bikes)
+                {
+                    var existing = await _context.BikeModels
+                        .Include(b => b.Inventory)
+                        .FirstOrDefaultAsync(b => b.Id == bike.Id);
+
+                    if (existing == null)
+                    {
+                        // ➕ CREATE NEW
+                        var newBike = new BikeModel
+                        {
+                            Id = bike.Id,
+                            Name = bike.Name,
+                            Brand = bike.Brand,
+                            Year = bike.Year,
+                            Price = bike.Price,
+                            Description = bike.Description,
+                            ImageUrl = bike.ImageUrl,
+                            Inventory = new Inventory
+                            {
+                                Quantity = bike.InventoryQuantity ?? 0
+                            }
+                        };
+
+                        _context.BikeModels.Add(newBike);
+                    }
+                    else
+                    {
+                        // 🔄 UPDATE EXISTING
+                        existing.Name = bike.Name;
+                        existing.Brand = bike.Brand;
+                        existing.Year = bike.Year;
+                        existing.Price = bike.Price;
+                        existing.Description = bike.Description;
+                        existing.ImageUrl = bike.ImageUrl;
+
+                        if (existing.Inventory == null)
+                        {
+                            existing.Inventory = new Inventory();
+                        }
+
+                        existing.Inventory.Quantity = bike.InventoryQuantity ?? 0;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

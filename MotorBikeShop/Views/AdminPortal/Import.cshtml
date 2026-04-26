@@ -1,0 +1,12 @@
+﻿<h2>Import Bikes</h2>
+
+<form asp-action="Import" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" class="form-control" />
+    <br />
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
