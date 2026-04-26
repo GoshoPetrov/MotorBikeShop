@@ -4,6 +4,7 @@ using MotorBikeShop.Areas.Identity.Data.Entities;
 using MotorBikeShop.Data;
 using MotorBikeShop.Models;
 using System.Security.Claims;
+using System.Text;
 
 namespace MotorBikeShop.Services
 {
@@ -20,12 +21,12 @@ namespace MotorBikeShop.Services
         Task<BikeViewModel> GetBikeModelDetails(int id);
         Task<List<BikeViewModel>> GetBikeModelIndex();
         Task<BikeViewModel> GetShowcaseDetail(int id);
-        Task<List<BikeViewModel>> GetShowcase(string searchString);
+        Task<List<BikeViewModel>> GetShowcase(string csv);
         Task<List<BikeViewModel>> BikeInventory();
 
 
-        Task<string> ExportBikes();
-        Task<bool> ImportBikes(string json);
+        Task<string> ExportBikesCsv();
+        Task<bool> ImportBikesCsv(string csv);
     }
 
 
@@ -394,66 +395,102 @@ namespace MotorBikeShop.Services
             return result;
         }
 
-        public async Task<string> ExportBikes()
+        public async Task<string> ExportBikesCsv()
         {
             var bikes = await BikeInventory();
 
-            return System.Text.Json.JsonSerializer.Serialize(bikes, new System.Text.Json.JsonSerializerOptions
+            var sb = new StringBuilder();
+
+            // Header
+            sb.AppendLine("Id,Name,Brand,Year,Price,Description,InventoryQuantity,ImageUrl");
+
+            foreach (var b in bikes)
             {
-                WriteIndented = true
-            });
+                sb.AppendLine($"{b.Id}," +
+                              $"{Escape(b.Name)}," +
+                              $"{Escape(b.Brand)}," +
+                              $"{b.Year}," +
+                              $"{b.Price}," +
+                              $"{Escape(b.Description)}," +
+                              $"{b.InventoryQuantity}," +
+                              $"{Escape(b.ImageUrl)}");
+            }
+
+            return sb.ToString();
         }
 
-        public async Task<bool> ImportBikes(string json)
+        public async Task<bool> ImportBikesCsv(string csv)
         {
             try
             {
-                var bikes = System.Text.Json.JsonSerializer.Deserialize<List<BikeViewModel>>(json);
+                var lines = csv.Split('\n')
+                               .Skip(1); // skip header
 
-                if (bikes == null) return false;
-
-                foreach (var bike in bikes)
+                foreach (var line in lines)
                 {
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    var values = line.Split(',');
+
+                    if (values.Length < 8)
+                        continue; // skip invalid rows
+
+                    var id = int.Parse(values[0]);
+
+                    var bikeVm = new BikeViewModel
+                    {
+                        Id = id,
+                        Name = values[1],
+                        Brand = values[2],
+                        Year = int.Parse(values[3]),
+                        Price = decimal.Parse(values[4]),
+                        Description = values[5],
+                        InventoryQuantity = int.TryParse(values[6], out var q) ? q : 0
+                    };
+                    if (string.IsNullOrWhiteSpace(values[7]))
+                    {
+                        bikeVm.ImageUrl = values[7];
+                    }
+
+                    // 🔍 CHECK IF EXISTS
                     var existing = await _context.BikeModels
                         .Include(b => b.Inventory)
-                        .FirstOrDefaultAsync(b => b.Id == bike.Id);
+                        .FirstOrDefaultAsync(b => b.Id == bikeVm.Id);
 
-                    if (existing == null)
+                    if (existing != null)
                     {
-                        // ➕ CREATE NEW
+                        // 🔄 UPDATE
+                        existing.Name = bikeVm.Name;
+                        existing.Brand = bikeVm.Brand;
+                        existing.Year = bikeVm.Year;
+                        existing.Price = bikeVm.Price;
+                        existing.Description = bikeVm.Description;
+                        existing.ImageUrl = bikeVm.ImageUrl;
+
+                        // inventory safe update
+                        existing.Inventory ??= new Inventory();
+                        existing.Inventory.Quantity = bikeVm.InventoryQuantity ?? 0;
+                    }
+                    else
+                    {
+                        // ➕ INSERT
                         var newBike = new BikeModel
                         {
-                            Id = bike.Id,
-                            Name = bike.Name,
-                            Brand = bike.Brand,
-                            Year = bike.Year,
-                            Price = bike.Price,
-                            Description = bike.Description,
-                            ImageUrl = bike.ImageUrl,
+                            Id = bikeVm.Id,
+                            Name = bikeVm.Name,
+                            Brand = bikeVm.Brand,
+                            Year = bikeVm.Year,
+                            Price = bikeVm.Price,
+                            Description = bikeVm.Description,
+                            ImageUrl = bikeVm.ImageUrl,
                             Inventory = new Inventory
                             {
-                                Quantity = bike.InventoryQuantity ?? 0
+                                Quantity = bikeVm.InventoryQuantity ?? 0
                             }
                         };
 
                         _context.BikeModels.Add(newBike);
-                    }
-                    else
-                    {
-                        // 🔄 UPDATE EXISTING
-                        existing.Name = bike.Name;
-                        existing.Brand = bike.Brand;
-                        existing.Year = bike.Year;
-                        existing.Price = bike.Price;
-                        existing.Description = bike.Description;
-                        existing.ImageUrl = bike.ImageUrl;
-
-                        if (existing.Inventory == null)
-                        {
-                            existing.Inventory = new Inventory();
-                        }
-
-                        existing.Inventory.Quantity = bike.InventoryQuantity ?? 0;
                     }
                 }
 
@@ -464,6 +501,18 @@ namespace MotorBikeShop.Services
             {
                 return false;
             }
+        }
+
+        private string Escape(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return "";
+
+            if (value.Contains(",") || value.Contains("\""))
+            {
+                return $"\"{value.Replace("\"", "\"\"")}\"";
+            }
+
+            return value;
         }
     }
 }

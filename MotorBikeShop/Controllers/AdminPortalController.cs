@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotorBikeShop.Data;
@@ -17,11 +18,11 @@ public class AdminPortalController : Controller
     // 📤 EXPORT
     public async Task<IActionResult> Export()
     {
-        var json = await _shopService.ExportBikes();
+        var csv = await _shopService.ExportBikesCsv();
 
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(csv);
 
-        return File(bytes, "application/json", "bikes.json");
+        return File(bytes, "text/csv", "bikes.csv");
     }
 
     // 📥 IMPORT PAGE
@@ -36,25 +37,19 @@ public class AdminPortalController : Controller
     {
         if (file == null || file.Length == 0)
         {
-            TempData["Error"] = "Please upload a file.";
+            TempData["Error"] = "Upload a CSV file.";
             return View();
         }
 
         using var reader = new StreamReader(file.OpenReadStream());
-        var json = await reader.ReadToEndAsync();
+        var csv = await reader.ReadToEndAsync();
 
-        var success = await _shopService.ImportBikes(json);
+        var success = await _shopService.ImportBikesCsv(csv);
 
-        if (!success)
-        {
-            TempData["Error"] = "Import failed.";
-        }
-        else
-        {
-            TempData["Success"] = "Import successful!";
-        }
+        TempData[success ? "Success" : "Error"] =
+            success ? "Import successful!" : "Import failed.";
 
-        return RedirectToAction("Bikes");
+        return RedirectToAction("Index", "AdminPortal");
     }
 
     // LIST ALL BIKES (ADMIN VIEW)
