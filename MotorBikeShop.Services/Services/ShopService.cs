@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MotorBikeShop.Areas.Identity.Data.Entities;
 using MotorBikeShop.Data;
 using MotorBikeShop.Models;
@@ -421,6 +420,7 @@ namespace MotorBikeShop.Services
 
         public async Task<bool> ImportBikesCsv(string csv)
         {
+            int lineNo = 1; // header is at 1
             try
             {
                 var lines = csv.Split('\n')
@@ -428,6 +428,7 @@ namespace MotorBikeShop.Services
 
                 foreach (var line in lines)
                 {
+                    lineNo++;
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
@@ -446,12 +447,9 @@ namespace MotorBikeShop.Services
                         Year = int.Parse(values[3]),
                         Price = decimal.Parse(values[4]),
                         Description = values[5],
-                        InventoryQuantity = int.TryParse(values[6], out var q) ? q : 0
+                        InventoryQuantity = int.TryParse(values[6], out var q) ? q : 0,
+                        ImageUrl = values[7]
                     };
-                    if (string.IsNullOrWhiteSpace(values[7]))
-                    {
-                        bikeVm.ImageUrl = values[7];
-                    }
 
                     // 🔍 CHECK IF EXISTS
                     var existing = await _context.BikeModels
@@ -466,7 +464,8 @@ namespace MotorBikeShop.Services
                         existing.Year = bikeVm.Year;
                         existing.Price = bikeVm.Price;
                         existing.Description = bikeVm.Description;
-                        existing.ImageUrl = bikeVm.ImageUrl;
+                        if (!string.IsNullOrWhiteSpace(bikeVm.ImageUrl))
+                            existing.ImageUrl = bikeVm.ImageUrl;
 
                         // inventory safe update
                         existing.Inventory ??= new Inventory();
@@ -497,9 +496,10 @@ namespace MotorBikeShop.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                Console.WriteLine(ex); // TODO: Log and analize
+                throw new ShopException($"Sopmething went wrong at line {lineNo}!");
             }
         }
 
