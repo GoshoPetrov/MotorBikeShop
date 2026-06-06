@@ -22,9 +22,12 @@
 <form asp-action="Index" method="get">
     <input id="searchString" type="text" name="searchString" value="@Context.Request.Query["searchString"]"
            placeholder="Search by bike name..." />
+    <div id="searchResults" class="list-group mt-1"></div>
     <button type="submit" class="btn btn-primary">Search</button>
     <a asp-action="Index" class="btn btn-secondary">Clear</a>
 </form>
+
+
 
 
 
@@ -91,14 +94,46 @@
                 // Ajax call or form submit
                 console.log("Searching for:", search);
 
-                const response = await fetch(`/api/search?term=${encodeURI(search)}`);
+                const response = await fetch(`/api/search?term=${encodeURIComponent(search)}`);
 
                 const data = await response.json();
 
                 console.log(data);
+                renderResults(data);
 
             }, 500);
         });
+
+        function renderResults(items) {
+            clearResults();
+
+            const resultsBox = document.getElementById("searchResults");
+            const input = document.getElementById("searchString");
+
+            if (!items || items.length === 0) {
+                resultsBox.innerHTML = `<div class="list-group-item text-muted">No results found</div>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "list-group-item list-group-item-action";
+                div.textContent = item;
+
+                // optional click behavior
+                div.addEventListener("click", () => {
+                    input.value = item;
+                    clearResults();
+                });
+
+                resultsBox.appendChild(div);
+            });
+        }
+
+        function clearResults() {
+            const resultsBox = document.getElementById("searchResults");
+            resultsBox.innerHTML = "";
+        }
     </script>
 
 }
