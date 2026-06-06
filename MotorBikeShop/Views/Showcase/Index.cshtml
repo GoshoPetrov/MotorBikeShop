@@ -20,7 +20,7 @@
 </div>
 
 <form asp-action="Index" method="get">
-    <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
+    <input id="searchString" type="text" name="searchString" value="@Context.Request.Query["searchString"]"
            placeholder="Search by bike name..." />
     <button type="submit" class="btn btn-primary">Search</button>
     <a asp-action="Index" class="btn btn-secondary">Clear</a>
@@ -70,13 +70,29 @@
     }
 </div>
 
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            const alert = document.getElementById('messageAlert');
+            if (alert) {
+                alert.classList.add('fade');
+                setTimeout(() => alert.remove(), 150);
+            }
+        }, 3000);
 
-<script>
-    setTimeout(function () {
-        const alert = document.getElementById('messageAlert');
-        if (alert) {
-            alert.classList.add('fade');
-            setTimeout(() => alert.remove(), 150);
-        }
-    }, 3000);
-</script>
+        let timer;
+
+        $("#searchString").on("input", function () {
+            clearTimeout(timer);
+
+            timer = setTimeout(() => {
+                const search = $(this).val();
+
+                // Ajax call or form submit
+                console.log("Searching for:", search);
+
+            }, 500);
+        });
+    </script>
+
+}
