@@ -1,0 +1,31 @@
+## Build artefacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+## Test results
+**/TestResults/
+
+## IDE / OS junk
+.vs/
+.vscode/
+.idea/
+**/.DS_Store
+**/Thumbs.db
+
+## Docker files (not needed inside the image)
+Dockerfile
+docker-compose*.yaml
+docker-entrypoint.sh
+.dockerignore
+
+## Secrets — never bake into the image
+.env
+*.env
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+## Git
+.git/
+.gitignore
