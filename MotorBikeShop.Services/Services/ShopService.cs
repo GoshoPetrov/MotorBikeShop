@@ -23,6 +23,7 @@ namespace MotorBikeShop.Services
         Task<List<BikeViewModel>> GetShowcase(string csv);
         Task<List<BikeViewModel>> BikeInventory();
 
+        Task<List<BikeModel>> SearchForBikes(string term);
 
         Task<string> ExportBikesCsv();
         Task<bool> ImportBikesCsv(string csv);
@@ -31,6 +32,7 @@ namespace MotorBikeShop.Services
 
     public class ShopService : IShopService
     {
+
         private BasketItemViewModel ToViewModel(BasketItem db)
         {
             return new BasketItemViewModel()
@@ -77,6 +79,25 @@ namespace MotorBikeShop.Services
         {
             _context = context;
             _currentUser = currentUser;
+        }
+
+        public async Task<List<BikeModel>> SearchForBikes(string term)
+        {
+            try
+            {
+                var result = await _context.Inventories
+                    .Where(b => b.BikeModel.Name.StartsWith(term) || b.BikeModel.Brand.StartsWith(term))
+                    .Select((b) => b.BikeModel)
+                    .ToListAsync();
+
+                return result;
+            }
+            catch
+            {
+                //this is not an inportant functionality
+                return new List<BikeModel>();
+            }
+
         }
 
         public async Task ConfirmPurchase()

@@ -85,11 +85,17 @@
         $("#searchString").on("input", function () {
             clearTimeout(timer);
 
-            timer = setTimeout(() => {
+            timer = setTimeout(async () => {
                 const search = $(this).val();
 
                 // Ajax call or form submit
                 console.log("Searching for:", search);
+
+                const response = await fetch(`/api/search?term=${encodeURI(search)}`);
+
+                const data = await response.json();
+
+                console.log(data);
 
             }, 500);
         });
