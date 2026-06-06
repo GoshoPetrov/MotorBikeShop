@@ -15,10 +15,11 @@ public class ShowcaseController : Controller
     }
 
     // GET: Showcase
-    public async Task<IActionResult> Index(string searchString)
+    public async Task<IActionResult> Index(string searchString, string message)
     {
         var bikes = await _shopService.GetShowcase(searchString);
 
+        ViewBag.Message = message;
         return View(bikes);
     }
 

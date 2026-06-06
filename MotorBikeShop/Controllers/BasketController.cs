@@ -44,7 +44,10 @@ public class BasketController : Controller
             TempData["Error"] = "Something went wrong. Try again later";
         }
 
-       return RedirectToAction("Index", "Showcase");
+       return RedirectToAction(
+           "Index"
+           , "Showcase",
+           new { message = "Your item has been added to the basket" });
     }
 
     // POST: Remove item

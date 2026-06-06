@@ -1,5 +1,16 @@
 ﻿@model IEnumerable<BikeViewModel>
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.Message))
+{
+    <div id="messageAlert" class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @ViewBag.Message
+    </div>
+
+}
+
+
+
 <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2>Bike Showcase</h2>
 
@@ -58,3 +69,14 @@
 
     }
 </div>
+
+
+<script>
+    setTimeout(function () {
+        const alert = document.getElementById('messageAlert');
+        if (alert) {
+            alert.classList.add('fade');
+            setTimeout(() => alert.remove(), 150);
+        }
+    }, 3000);
+</script>
