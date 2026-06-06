@@ -1,0 +1,16 @@
+﻿@model int
+
+<h1>Error @Model</h1>
+
+@if (Model == 404)
+{
+    <p>The page could not be found.</p>
+}
+else
+{
+    <p>An error occurred.</p>
+}
+
+<a asp-controller="Showcase" asp-action="Index" class="btn btn-warning">
+    Back to Showcase
+</a>

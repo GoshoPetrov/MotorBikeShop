@@ -33,5 +33,11 @@ namespace MotorBikeShop.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        //Use to test the custom error page
+        public IActionResult Boom()
+        {
+            throw new Exception("Gruma");
+        }
     }
 }
