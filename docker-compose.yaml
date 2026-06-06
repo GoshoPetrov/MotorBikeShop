@@ -2,6 +2,18 @@ name: motorbikeshop
 
 services:
 
+  # ── Cloudflare Tunnel ────────────────────────────────────────────────────────
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: motorbikeshop-tunnel
+    restart: unless-stopped
+    depends_on:
+      - app
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - default
+
+
   # ── MS SQL Server ────────────────────────────────────────────────────────────
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -11,8 +23,8 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "${DB_SA_PASSWORD}"   # loaded from .env
       MSSQL_PID: "Developer"                   # free Developer edition
-    ports:
-      - "1433:1433"                            # optional: expose to host for SSMS / Azure Data Studio
+    # ports:
+    #   - "1433:1433"                            # optional: expose to host for SSMS / Azure Data Studio
     volumes:
       - sqldata:/var/opt/mssql
     healthcheck:
@@ -56,8 +68,8 @@ services:
 
       ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Production}"
       ASPNETCORE_URLS: "http://+:8080"
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
 
 volumes:
   sqldata:
