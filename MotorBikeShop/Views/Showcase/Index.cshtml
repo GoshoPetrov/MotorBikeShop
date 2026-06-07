@@ -22,9 +22,10 @@
 <form asp-action="Index" method="get">
     <input id="searchString" type="text" name="searchString" value="@Context.Request.Query["searchString"]"
            placeholder="Search by bike name..." />
-    <div id="searchResults" class="list-group mt-1"></div>
     <button type="submit" class="btn btn-primary">Search</button>
     <a asp-action="Index" class="btn btn-secondary">Clear</a>
+    <div id="searchResults" class="list-group mt-1"></div>
+
 </form>
 
 

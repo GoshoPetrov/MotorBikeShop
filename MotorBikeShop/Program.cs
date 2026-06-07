@@ -48,6 +48,8 @@ namespace MotorBikeShop
                 app.UseHsts();
             }
 
+            app.UseExceptionHandler("/Error");
+
             app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
             app.UseHttpsRedirection();
