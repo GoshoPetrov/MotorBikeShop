@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MotorBikeShop.Areas.Identity.Data;
 using MotorBikeShop.Data;
+using MotorBikeShop.Infrastructure;
 using MotorBikeShop.Services;
 namespace MotorBikeShop
 {
@@ -30,6 +31,8 @@ namespace MotorBikeShop
 
             var app = builder.Build();
 
+               var logger = app.Logger;
+            await DatabaseInitializer.InitializeAsync(app.Services, logger);
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;

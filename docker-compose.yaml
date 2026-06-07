@@ -1,0 +1,75 @@
+name: motorbikeshop
+
+services:
+
+  # ── Cloudflare Tunnel ────────────────────────────────────────────────────────
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: motorbikeshop-tunnel
+    restart: unless-stopped
+    depends_on:
+      - app
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - default
+
+
+  # ── MS SQL Server ────────────────────────────────────────────────────────────
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: motorbikeshop-db
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${DB_SA_PASSWORD}"   # loaded from .env
+      MSSQL_PID: "Developer"                   # free Developer edition
+    # ports:
+    #   - "1433:1433"                            # optional: expose to host for SSMS / Azure Data Studio
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: >
+        /opt/mssql-tools18/bin/sqlcmd
+        -S localhost,1433
+        -U sa
+        -P "$$MSSQL_SA_PASSWORD"
+        -Q "SELECT 1"
+        -C -b
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── ASP.NET Web App ──────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: motorbikeshop-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy   # only start after SQL Server passes its health-check
+    environment:
+      # Override the connection string via environment variable.
+      # ASP.NET Core maps  ConnectionStrings__<name>  →  GetConnectionString("<name>")
+      ConnectionStrings__MotorBikeShopContextConnection: >-
+        Server=db,1433;
+        Database=MotorBikeShopDB;
+        User Id=sa;
+        Password=${DB_SA_PASSWORD};
+        TrustServerCertificate=True;
+        MultipleActiveResultSets=True;
+
+      # Passed to docker-entrypoint.sh so it can wait for SQL Server
+      DB_HOST: "db"
+      DB_PORT: "1433"
+      DB_SA_PASSWORD: "${DB_SA_PASSWORD}"
+
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Production}"
+      ASPNETCORE_URLS: "http://+:8080"
+    # ports:
+    #   - "8080:8080"
+
+volumes:
+  sqldata:
