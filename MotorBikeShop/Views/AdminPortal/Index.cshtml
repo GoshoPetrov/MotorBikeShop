@@ -26,11 +26,10 @@
                 <td>
                     @(bike.InventoryQuantity != null ? bike.InventoryQuantity : 0)
                 </td>
-                <td>
-                    <a asp-action="Export" class="btn btn-success">Export Bikes</a>
-                    <a asp-action="Import" class="btn btn-primary">Import Bikes</a>
-                </td>
             </tr>
         }
     </tbody>
 </table>
+
+<a asp-action="Export" class="btn btn-success">Export Bikes</a>
+<a asp-action="Import" class="btn btn-primary">Import Bikes</a>
