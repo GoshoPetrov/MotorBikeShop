@@ -23,6 +23,8 @@ public static class DatabaseInitializer
             // ── Seed data ─────────────────────────────────────────────────────
             // Uncomment / extend with your own seeding logic:
             // await SeedAsync(db, logger);
+
+            await MotorBikeShopContext.SeedDataAsync(db);
         }
         catch (Exception ex)
         {
