@@ -3,10 +3,7 @@
     using Microsoft.AspNetCore.Http;
     using System.Security.Claims;
 
-    public interface ICurrentUserService
-    {
-        string? UserId { get; }
-    }
+    
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _contextAccessor;
