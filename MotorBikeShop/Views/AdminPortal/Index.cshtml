@@ -1,5 +1,8 @@
 ﻿@model IEnumerable<BikeViewModel>
 
+@* Anti-forgery token for AJAX requests *@
+@Html.AntiForgeryToken()
+
 <h2>Admin - Bike Management</h2>
 
 <table class="table table-bordered">
@@ -17,14 +20,55 @@
     <tbody>
         @foreach (var bike in Model)
         {
-            <tr>
+            <tr data-bike-id="@bike.Id">
                 <td>@bike.Id</td>
-                <td>@bike.Name</td>
-                <td>@bike.Brand</td>
-                <td>@bike.Year</td>
-                <td>@bike.Price</td>
+
+                <!-- Editable: Name -->
+                <td class="editable" data-field="Name">
+                    <span class="editable-display">@bike.Name</span>
+                    <input class="editable-input form-control form-control-sm d-none" type="text"
+                           value="@bike.Name" data-original="@bike.Name" />
+                    <span class="editable-error text-danger small d-none"></span>
+                </td>
+
+                <!-- Editable: Brand -->
+                <td class="editable" data-field="Brand">
+                    <span class="editable-display">@bike.Brand</span>
+                    <input class="editable-input form-control form-control-sm d-none" type="text"
+                           value="@bike.Brand" data-original="@bike.Brand" />
+                    <span class="editable-error text-danger small d-none"></span>
+                </td>
+
+                <!-- Editable: Year -->
+                <td class="editable" data-field="Year">
+                    <span class="editable-display">@bike.Year</span>
+                    <input class="editable-input form-control form-control-sm d-none" type="number"
+                           value="@bike.Year" data-original="@bike.Year" min="1900" max="2100" />
+                    <span class="editable-error text-danger small d-none"></span>
+                </td>
+
+                <!-- Editable: Price -->
+                <td class="editable" data-field="Price">
+                    <span class="editable-display">@bike.Price</span>
+                    <input class="editable-input form-control form-control-sm d-none" type="number"
+                           value="@bike.Price" data-original="@bike.Price" min="0" step="0.01" />
+                    <span class="editable-error text-danger small d-none"></span>
+                </td>
+
+                <!-- Editable: Stock (Inventory.Quantity) -->
+                <td class="editable" data-field="Stock">
+                    <span class="editable-display">
+                        @(bike.InventoryQuantity.HasValue ? bike.InventoryQuantity.Value : 0)
+                    </span>
+                    <input class="editable-input form-control form-control-sm d-none" type="number"
+                           value="@(bike.InventoryQuantity.HasValue ? bike.InventoryQuantity.Value : 0)"
+                           data-original="@(bike.InventoryQuantity.HasValue ? bike.InventoryQuantity.Value : 0)"
+                           min="0" step="1" />
+                    <span class="editable-error text-danger small d-none"></span>
+                </td>
+
                 <td>
-                    @(bike.InventoryQuantity != null ? bike.InventoryQuantity : 0)
+                    <!-- Placeholder for future action buttons -->
                 </td>
             </tr>
         }
@@ -33,3 +77,144 @@
 
 <a asp-action="Export" class="btn btn-success">Export Bikes</a>
 <a asp-action="Import" class="btn btn-primary">Import Bikes</a>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // ── Enter edit mode on click ──────────────────────────────────
+            $(document).on('click', '.editable', function () {
+                const $cell = $(this);
+                if ($cell.hasClass('editing')) return;
+
+                $cell.addClass('editing');
+                $cell.find('.editable-display').addClass('d-none');
+                const $input = $cell.find('.editable-input').removeClass('d-none');
+                $input.focus().select();
+            });
+
+            // ── Save on Enter ─────────────────────────────────────────────
+            $(document).on('keydown', '.editable-input', function (e) {
+                const $input = $(this);
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveField($input);
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelEdit($input);
+                }
+            });
+
+            // ── Save on blur ──────────────────────────────────────────────
+            $(document).on('blur', '.editable-input', function () {
+                const $input = $(this);
+                // Use a small timeout so click events on the cell don't conflict
+                setTimeout(() => saveField($input), 150);
+            });
+
+            // ── Save function (AJAX) ──────────────────────────────────────
+            function saveField($input) {
+                const $cell = $input.closest('.editable');
+                const $display = $cell.find('.editable-display');
+                const $error = $cell.find('.editable-error');
+                const field = $cell.data('field');
+                const bikeId = $cell.closest('tr').data('bike-id');
+                const newValue = String($input.val()).trim();
+                const originalValue = String($input.data('original'));
+
+                // ── Skip if unchanged ────────────────────────────────────
+                if (newValue === originalValue) {
+                    cancelEdit($input);
+                    return;
+                }
+
+                // ── Basic client-side validation ──────────────────────────
+                if (!newValue) {
+                    showError($cell, 'Value cannot be empty.');
+                    return;
+                }
+                if (field === 'Year' && (isNaN(newValue) || +newValue < 1900 || +newValue > 2100)) {
+                    showError($cell, 'Year must be between 1900 and 2100.');
+                    return;
+                }
+                if (field === 'Price' && (isNaN(newValue) || +newValue < 0)) {
+                    showError($cell, 'Price must be a non-negative number.');
+                    return;
+                }
+                if (field === 'Stock' && (isNaN(newValue) || +newValue < 0 || !Number.isInteger(+newValue))) {
+                    showError($cell, 'Stock must be a non-negative integer.');
+                    return;
+                }
+
+                // ── Get anti-forgery token ────────────────────────────────
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                // ── AJAX POST ─────────────────────────────────────────────
+                $.ajax({
+                    url: '@Url.Action("UpdateBikeField", "AdminPortal")',
+                    type: 'POST',
+                    data: {
+                        __RequestVerificationToken: token,
+                        bikeId: bikeId,
+                        field: field,
+                        value: newValue
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Update display & data-original
+                            const displayValue = field === 'Price'
+                                ? parseFloat(newValue).toFixed(2)
+                                : newValue;
+                            $display.text(displayValue);
+                            $input.data('original', newValue);
+                            $error.addClass('d-none').text('');
+                            exitEdit($cell, displayValue);
+                            showToast('success', field + ' updated successfully.');
+                        } else {
+                            showError($cell, response.errors ? response.errors.join(', ') : 'Save failed.');
+                        }
+                    },
+                    error: function () {
+                        showError($cell, 'Network error. Please try again.');
+                    }
+                });
+            }
+
+            function cancelEdit($input) {
+                const $cell = $input.closest('.editable');
+                $input.val($input.data('original'));
+                exitEdit($cell, $input.data('original'));
+            }
+
+            function exitEdit($cell, displayValue) {
+                $cell.find('.editable-input').addClass('d-none');
+                $cell.find('.editable-display').text(displayValue).removeClass('d-none');
+                $cell.removeClass('editing');
+            }
+
+            function showError($cell, message) {
+                const $error = $cell.find('.editable-error');
+                $error.text(message).removeClass('d-none');
+                // Auto-hide after 3 seconds
+                setTimeout(() => $error.addClass('d-none'), 3000);
+            }
+
+            // ── Toast notification (Bootstrap 5) ──────────────────────────
+            function showToast(type, message) {
+                const toastHtml = `
+                    <div class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
+                         role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 9999;">
+                        <div class="d-flex">
+                            <div class="toast-body">${message}</div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                    data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>`;
+                const $toast = $(toastHtml);
+                $('body').append($toast);
+                const toast = new bootstrap.Toast($toast[0], { delay: 2000 });
+                toast.show();
+                $toast.on('hidden.bs.toast', () => $toast.remove());
+            }
+        });
+    </script>
+}

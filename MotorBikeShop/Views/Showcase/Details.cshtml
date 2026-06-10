@@ -1,4 +1,4 @@
-﻿@model BikeViewModel
+@model BikeViewModel
 
 <h2>@Model.Name</h2>
 
@@ -31,3 +31,57 @@
         <button class="btn btn-secondary" disabled>Out of Stock</button>
     }
 </form>
+
+<!-- Comments Section -->
+<div class="mt-5">
+    <h4>Comments (@Model.Comments.Count)</h4>
+    <hr />
+
+    <!-- Comment Form -->
+    <form asp-controller="Comments" asp-action="Create" method="post" class="mb-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="BikeModelId" value="@Model.Id" />
+        <div class="form-group">
+            <textarea name="Content" class="form-control" rows="3" maxlength="500"
+                      placeholder="Write a comment..." required></textarea>
+            <small class="text-muted">Max 500 characters.</small>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Post Comment</button>
+    </form>
+
+    <!-- Comment List -->
+    @if (Model.Comments.Any())
+    {
+        foreach (var comment in Model.Comments)
+        {
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <strong>@comment.AuthorUserName</strong>
+                        <small class="text-muted">
+                            @comment.CreatedAt.ToString("g")
+                        </small>
+                    </div>
+                    <p class="card-text mt-1">@comment.Content</p>
+                    @if (comment.CanDelete)
+                    {
+                        <form asp-controller="Comments" asp-action="Delete" method="post"
+                              style="display:inline"
+                              onsubmit="return confirm('Delete this comment?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@comment.Id" />
+                            <input type="hidden" name="bikeModelId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Delete
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">No comments yet. Be the first to comment!</p>
+    }
+</div>

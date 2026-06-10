@@ -1,8 +1,4 @@
-﻿using MotorBikeShop.Areas.Identity.Data.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace MotorBikeShop.Models
+﻿namespace MotorBikeShop.Models
 {
     public class BikeViewModel
     {
@@ -21,5 +17,10 @@ namespace MotorBikeShop.Models
         public int? InventoryQuantity { get; set; }
 
         public string ImageUrl { get; set; }
+
+        /// <summary>
+        /// Comments on this bike, ordered by newest first.
+        /// </summary>
+        public IReadOnlyList<CommentViewModel> Comments { get; set; } = Array.Empty<CommentViewModel>();
     }
 }

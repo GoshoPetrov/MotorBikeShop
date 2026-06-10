@@ -65,7 +65,6 @@ public class BasketController : Controller
     }
 
     [HttpPost]
-    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Increase(int itemId)
     {

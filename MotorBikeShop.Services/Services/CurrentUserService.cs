@@ -16,5 +16,9 @@
         public string? UserId =>
             _contextAccessor.HttpContext?.User?
                 .FindFirstValue(ClaimTypes.NameIdentifier);
+
+        public bool IsAdmin =>
+            _contextAccessor.HttpContext?.User?
+                .IsInRole("Admin") ?? false;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MotorBikeShop.Areas.Identity.Data.Entities;
 using MotorBikeShop.Data;
 using MotorBikeShop.Models;
@@ -10,8 +11,20 @@ namespace MotorBikeShop.Services
     
     public class ShopService : IShopService
     {
+        private readonly MotorBikeShopContext _context;
 
-        private BasketItemViewModel ToViewModel(BasketItem db)
+        private readonly ICurrentUserService _currentUser;
+
+        private readonly ILogger<ShopService> _logger;
+
+        public ShopService(MotorBikeShopContext context, ICurrentUserService currentUser, ILogger<ShopService> logger)
+        {
+            _context = context;
+            _currentUser = currentUser;
+            _logger = logger;
+        }
+
+        private static BasketItemViewModel ToViewModel(BasketItem db)
         {
             return new BasketItemViewModel()
             {
@@ -24,7 +37,7 @@ namespace MotorBikeShop.Services
 
             };
         }
-        private BasketViewModel ToViewModel(Basket db)
+        private static BasketViewModel ToViewModel(Basket db)
         {
             return new BasketViewModel()
             {
@@ -34,7 +47,7 @@ namespace MotorBikeShop.Services
             };
         }
 
-        private BikeViewModel ToViewModel(BikeModel db)
+        private static BikeViewModel ToViewModel(BikeModel db)
         {
             return new BikeViewModel()
             {
@@ -47,16 +60,6 @@ namespace MotorBikeShop.Services
                 InventoryQuantity = db.Inventory?.Quantity,
                 ImageUrl = db.ImageUrl
             };
-        }
-
-        private readonly MotorBikeShopContext _context;
-
-        private readonly ICurrentUserService _currentUser;
-
-        public ShopService(MotorBikeShopContext context, ICurrentUserService currentUser)
-        {
-            _context = context;
-            _currentUser = currentUser;
         }
 
         public async Task<List<BikeModel>> SearchForBikes(string term)
@@ -101,7 +104,7 @@ namespace MotorBikeShop.Services
 
                 if (inventory == null || inventory.Quantity < item.Quantity)
                 {
-                    throw new OutOfStockExeption($"Not enough stock for {item.BikeModel.Name}");
+                    throw new OutOfStockException($"Not enough stock for {item.BikeModel.Name}");
                 }
             }
 
@@ -115,6 +118,8 @@ namespace MotorBikeShop.Services
 
             _context.Vents.Add(vent);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Purchase confirmed for user {UserId}, vent {VentId}, total {TotalPrice}", userId, vent.Id, vent.TotalPrice);
 
             // 4. CREATE VENT ITEMS
             foreach (var item in basket.Items)
@@ -137,6 +142,7 @@ namespace MotorBikeShop.Services
                 if (inventory != null)
                 {
                     inventory.Quantity -= item.Quantity;
+                    _logger.LogInformation("Stock updated for bike {BikeModelId}: reduced by {Quantity}, new stock {NewStock}", item.BikeModelId, item.Quantity, inventory.Quantity);
                 }
             }
 
@@ -181,7 +187,7 @@ namespace MotorBikeShop.Services
             }
             else
             {
-                throw new OutOfStockExeption("Cannot add more than available stock.");
+                throw new OutOfStockException("Cannot add more than available stock.");
             }
 
         }
@@ -197,7 +203,7 @@ namespace MotorBikeShop.Services
             // ❌ If no stock or bike doesn't exist
             if (inventory == null || inventory.Quantity <= 0)
             {
-                throw new OutOfStockExeption();
+                throw new OutOfStockException();
             }
 
             // 2. Get or create basket
@@ -230,7 +236,7 @@ namespace MotorBikeShop.Services
                 }
                 else
                 {
-                    throw new OutOfStockExeption("Cannot add more.");
+                    throw new OutOfStockException("Cannot add more.");
                 }
             }
             else
@@ -288,7 +294,7 @@ namespace MotorBikeShop.Services
             };
 
             _context.Baskets.Add(newBasket);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return ToViewModel(newBasket);
             
         }
@@ -297,6 +303,7 @@ namespace MotorBikeShop.Services
         {
             //bikeViewModel.Id
             var bike = await _context.BikeModels
+                .Include(b => b.Inventory)
                 .FirstOrDefaultAsync(b => b.Id == bikeViewModel.Id);
 
             if (bike == null)
@@ -311,11 +318,105 @@ namespace MotorBikeShop.Services
             bike.Year = bikeViewModel.Year;
             bike.Brand = bikeViewModel.Brand;
 
+            // Update inventory if InventoryQuantity is provided
+            if (bikeViewModel.InventoryQuantity.HasValue)
+            {
+                if (bike.Inventory == null)
+                {
+                    bike.Inventory = new Inventory
+                    {
+                        BikeModelId = bike.Id,
+                        Quantity = bikeViewModel.InventoryQuantity.Value
+                    };
+                    _context.Inventories.Add(bike.Inventory);
+                }
+                else
+                {
+                    bike.Inventory.Quantity = bikeViewModel.InventoryQuantity.Value;
+                }
+            }
+
             _context.Update(bike);
             await _context.SaveChangesAsync();
 
             return bikeViewModel;
         }
+
+        /// <inheritdoc />
+        public async Task<BikeViewModel> UpdateBikeFieldAsync(int bikeId, string field, string value)
+        {
+            var bike = await _context.BikeModels
+                .Include(b => b.Inventory)
+                .FirstOrDefaultAsync(b => b.Id == bikeId);
+
+            if (bike == null)
+                throw new ShopException($"Bike with ID {bikeId} not found.");
+
+            // Parse and apply the field change
+            switch (field)
+            {
+                case "Name":
+                    if (string.IsNullOrWhiteSpace(value))
+                        throw new ShopException("Name cannot be empty.");
+                    if (value.Length > 100)
+                        throw new ShopException("Name must be at most 100 characters.");
+                    bike.Name = value;
+                    break;
+
+                case "Brand":
+                    if (string.IsNullOrWhiteSpace(value))
+                        throw new ShopException("Brand cannot be empty.");
+                    if (value.Length > 100)
+                        throw new ShopException("Brand must be at most 100 characters.");
+                    bike.Brand = value;
+                    break;
+
+                case "Year":
+                    if (!int.TryParse(value, out var year))
+                        throw new ShopException("Year must be a valid integer.");
+                    if (year < 1900 || year > 2100)
+                        throw new ShopException("Year must be between 1900 and 2100.");
+                    bike.Year = year;
+                    break;
+
+                case "Price":
+                    if (!decimal.TryParse(value, out var price))
+                        throw new ShopException("Price must be a valid number.");
+                    if (price < 0)
+                        throw new ShopException("Price cannot be negative.");
+                    bike.Price = price;
+                    break;
+
+                case "Stock":
+                    if (!int.TryParse(value, out var quantity))
+                        throw new ShopException("Stock must be a valid integer.");
+                    if (quantity < 0)
+                        throw new ShopException("Stock cannot be negative.");
+
+                    if (bike.Inventory == null)
+                    {
+                        bike.Inventory = new Inventory
+                        {
+                            BikeModelId = bike.Id,
+                            Quantity = quantity
+                        };
+                        _context.Inventories.Add(bike.Inventory);
+                    }
+                    else
+                    {
+                        bike.Inventory.Quantity = quantity;
+                    }
+                    break;
+
+                default:
+                    throw new ShopException($"Unknown field: {field}");
+            }
+
+            await _context.SaveChangesAsync();
+
+            return ToViewModel(bike);
+        }
+
         public async Task<BikeViewModel?> DeleteBike(int id)
         {
             var bike = await _context.BikeModels.FindAsync(id);
@@ -356,14 +457,15 @@ namespace MotorBikeShop.Services
 
         public async Task<BikeViewModel?> GetShowcaseDetail(int id)
         {
-
             var bike = await _context.BikeModels
                 .Include(b => b.Inventory)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (bike == null) return null;
 
-            return ToViewModel(bike);
+            var viewModel = ToViewModel(bike);
+            viewModel.Comments = await GetCommentsForBikeAsync(id);
+            return viewModel;
         }
 
         public async Task<List<BikeViewModel>> GetShowcase(string searchString)
@@ -379,7 +481,78 @@ namespace MotorBikeShop.Services
         b.Brand.ToLower().Contains(searchString.ToLower()));
             }
 
-            return bikes.Select(ToViewModel).ToList();
+            return await bikes.Select(b => ToViewModel(b)).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<ShowcaseViewModel> GetShowcaseAsync(
+            string? searchString,
+            string? sortBy,
+            bool ascending,
+            int pageNumber,
+            int pageSize)
+        {
+            // Guard: clamp page number
+            if (pageNumber < 1)
+                pageNumber = 1;
+
+            // Guard: clamp page size
+            if (pageSize < 1)
+                pageSize = 6;
+            if (pageSize > 100)
+                pageSize = 100;
+
+            // 1. Base query
+            var query = _context.BikeModels
+                .Include(b => b.Inventory)
+                .AsQueryable();
+
+            // 2. Apply search filter
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var term = searchString.ToLower();
+                query = query.Where(b =>
+                    b.Name.ToLower().Contains(term) ||
+                    b.Brand.ToLower().Contains(term));
+            }
+
+            // 3. Count total matching items (before sorting/paging)
+            var totalItems = await query.CountAsync();
+
+            // 4. Apply sorting
+            query = (sortBy?.ToLowerInvariant()) switch
+            {
+                "brand" => ascending
+                    ? query.OrderBy(b => b.Brand)
+                    : query.OrderByDescending(b => b.Brand),
+                "price" => ascending
+                    ? query.OrderBy(b => b.Price)
+                    : query.OrderByDescending(b => b.Price),
+                "year" => ascending
+                    ? query.OrderBy(b => b.Year)
+                    : query.OrderByDescending(b => b.Year),
+                _ => ascending
+                    ? query.OrderBy(b => b.Name)
+                    : query.OrderByDescending(b => b.Name),
+            };
+
+            // 5. Apply paging
+            var bikes = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => ToViewModel(b))
+                .ToListAsync();
+
+            // 6. Return view model
+            return new ShowcaseViewModel
+            {
+                Bikes = bikes,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                SortBy = sortBy ?? "Name",
+                Ascending = ascending,
+            };
         }
 
         public async Task<List<BikeViewModel>> BikeInventory()
@@ -497,9 +670,90 @@ namespace MotorBikeShop.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex); // TODO: Log and analize
-                throw new ShopException($"Sopmething went wrong at line {lineNo}!");
+                _logger.LogError(ex, "CSV import failed at line {LineNo}", lineNo);
+                throw new ShopException($"Something went wrong at line {lineNo}!");
             }
+        }
+
+        // ── Comment Methods ────────────────────────────────────────────────────
+
+        public async Task<List<CommentViewModel>> GetCommentsForBikeAsync(int bikeModelId, CancellationToken ct = default)
+        {
+            var comments = await _context.Comments
+                .AsNoTracking()
+                .Where(c => c.BikeModelId == bikeModelId)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync(ct);
+
+            var currentUserId = _currentUser.UserId;
+            var isAdmin = _currentUser.IsAdmin;
+
+            // Load user data for each comment (if available via navigation)
+            var userIds = comments.Select(c => c.UserId).Distinct().ToList();
+            var users = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u.UserName ?? "Unknown", ct);
+
+            return comments.Select(c => new CommentViewModel
+            {
+                Id = c.Id,
+                BikeModelId = c.BikeModelId,
+                Content = c.Content,
+                AuthorUserName = users.GetValueOrDefault(c.UserId, "Unknown"),
+                AuthorId = c.UserId,
+                CreatedAt = c.CreatedAt,
+                CanDelete = c.UserId == currentUserId || isAdmin
+            }).ToList();
+        }
+
+        public async Task<CommentViewModel> AddCommentAsync(int bikeModelId, string content, CancellationToken ct = default)
+        {
+            var bikeExists = await _context.BikeModels.AnyAsync(b => b.Id == bikeModelId, ct);
+            if (!bikeExists)
+                throw new ShopException("Bike not found.");
+
+            var userId = GetUserId();
+
+            var comment = new Comment
+            {
+                BikeModelId = bikeModelId,
+                UserId = userId,
+                Content = content,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync(ct);
+
+            // Reload with user data for the view model
+            await _context.Entry(comment).Reference(c => c.User).LoadAsync(ct);
+
+            return new CommentViewModel
+            {
+                Id = comment.Id,
+                BikeModelId = comment.BikeModelId,
+                Content = comment.Content,
+                AuthorUserName = comment.User?.UserName ?? "Unknown",
+                AuthorId = comment.UserId,
+                CreatedAt = comment.CreatedAt,
+                CanDelete = true // the author just created it
+            };
+        }
+
+        public async Task DeleteCommentAsync(int commentId, CancellationToken ct = default)
+        {
+            var comment = await _context.Comments.FindAsync(new object[] { commentId }, ct);
+            if (comment == null)
+                throw new ShopException("Comment not found.");
+
+            var userId = GetUserId();
+            var isAdmin = _currentUser.IsAdmin;
+
+            if (comment.UserId != userId && !isAdmin)
+                throw new UnauthorizedAccessException("You do not have permission to delete this comment.");
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync(ct);
         }
 
         private string Escape(string value)

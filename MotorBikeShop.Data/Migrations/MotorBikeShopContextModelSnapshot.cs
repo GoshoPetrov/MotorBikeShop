@@ -8,7 +8,7 @@ using MotorBikeShop.Data;
 
 #nullable disable
 
-namespace MotorBikeShop.Migrations
+namespace MotorBikeShop.Data.Migrations
 {
     [DbContext(typeof(MotorBikeShopContext))]
     partial class MotorBikeShopContextModelSnapshot : ModelSnapshot
@@ -240,116 +240,38 @@ namespace MotorBikeShop.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BikeModels");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Brand = "Honda",
-                            ImageUrl = "https://cloudfront-us-east-1.images.arcpublishing.com/octane/K25WVPRMCVEDZJ7ZJK4BWE374Y.jpg",
-                            Name = "CBR600RR",
-                            Price = 12000m,
-                            Year = 2022
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Brand = "Yamaha",
-                            ImageUrl = "https://ultimatemotorcycling.com/wp-content/uploads/2022/08/2023-yamaha-yz125x-first-look-gncc-cross-country-racing-two-stroke-motorcycle-dirt-bike-1.jpg",
-                            Name = "YZ125",
-                            Price = 18000m,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Brand = "Kawasaki",
-                            ImageUrl = "https://www.cycleworld.com/resizer/hDgZ3RY9ecoWZYR-r5gIyTpp8JE=/arc-photo-octane/arc3-prod/public/HS6BF7FJD5EZHNW64BX4VKHCL4.jpg",
-                            Name = "Ninja ZX-6R",
-                            Price = 13000m,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Brand = "Ducati",
-                            ImageUrl = "https://images5.1000ps.net/b-f_W3011628-neue-ducati-panigale-v4-2025-638575009620977741.jpg?format=webp&quality=80&scale=both&width=2816&height=1584&mode=crop",
-                            Name = "Panigale V4",
-                            Price = 25000m,
-                            Year = 2024
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Brand = "Suzuki",
-                            ImageUrl = "https://iconicmotorbikeauctions.com/wp-content/uploads/2022/08/Suzuki-GSX-R750-Front-Right-Featured.jpg",
-                            Name = "GSX-R750",
-                            Price = 11000m,
-                            Year = 2022
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Brand = "BMW",
-                            ImageUrl = "https://bmw.europe-moto.com/img/cms/s1000rrv1.jpg",
-                            Name = "S1000RR",
-                            Price = 22000m,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Brand = "KTM",
-                            ImageUrl = "https://superbikestore.in/cdn/shop/products/16381CJ520_RC-390_2017_R77_3_4_SS_SS_CF_1Gray_2048x2048_a227f7c6-bfe0-40fa-80d1-c083fdfeecaa.jpg?v=1577786021",
-                            Name = "RC 390",
-                            Price = 7000m,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Brand = "Honda",
-                            ImageUrl = "https://powersportsbusiness.com/wp-content/uploads/2022/06/23-Honda-CRF450R-50th_Location-2a.jpg",
-                            Name = "CRF450R",
-                            Price = 9500m,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Brand = "Yamaha",
-                            ImageUrl = "https://motocrossactionmag.com/wp-content/uploads/2023/02/YZ450-front-angle.jpg",
-                            Name = "YZ450F",
-                            Price = 9800m,
-                            Year = 2024
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Brand = "Kawasaki",
-                            ImageUrl = "https://hudsonmotorcycles.com/wp-content/uploads/2024/11/IMG_2362.jpg",
-                            Name = "KX250",
-                            Price = 8200m,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Brand = "KTM",
-                            ImageUrl = "https://images5.1000ps.net/images_bikekat/2025/1-KTM/222-300_EXC/007-638550785727500522-ktm-300-exc.jpg?width=920&height=571&mode=crop&scale=both&format=webp",
-                            Name = "EXC 300",
-                            Price = 10500m,
-                            Year = 2024
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Brand = "Husqvarna",
-                            ImageUrl = "https://i.ytimg.com/vi/RbnfQW3TBpo/maxresdefault.jpg",
-                            Name = "TE 300i",
-                            Price = 11000m,
-                            Year = 2023
-                        });
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BikeModelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BikeModelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.Inventory", b =>
@@ -372,80 +294,6 @@ namespace MotorBikeShop.Migrations
                         .IsUnique();
 
                     b.ToTable("Inventories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BikeModelId = 1,
-                            Quantity = 5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BikeModelId = 2,
-                            Quantity = 3
-                        },
-                        new
-                        {
-                            Id = 3,
-                            BikeModelId = 3,
-                            Quantity = 4
-                        },
-                        new
-                        {
-                            Id = 4,
-                            BikeModelId = 4,
-                            Quantity = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            BikeModelId = 5,
-                            Quantity = 6
-                        },
-                        new
-                        {
-                            Id = 6,
-                            BikeModelId = 6,
-                            Quantity = 3
-                        },
-                        new
-                        {
-                            Id = 7,
-                            BikeModelId = 7,
-                            Quantity = 5
-                        },
-                        new
-                        {
-                            Id = 8,
-                            BikeModelId = 8,
-                            Quantity = 7
-                        },
-                        new
-                        {
-                            Id = 9,
-                            BikeModelId = 9,
-                            Quantity = 4
-                        },
-                        new
-                        {
-                            Id = 10,
-                            BikeModelId = 10,
-                            Quantity = 6
-                        },
-                        new
-                        {
-                            Id = 11,
-                            BikeModelId = 11,
-                            Quantity = 2
-                        },
-                        new
-                        {
-                            Id = 12,
-                            BikeModelId = 12,
-                            Quantity = 3
-                        });
                 });
 
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.VentItem", b =>
@@ -648,6 +496,25 @@ namespace MotorBikeShop.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.Comment", b =>
+                {
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", "BikeModel")
+                        .WithMany("Comments")
+                        .HasForeignKey("BikeModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BikeModel");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.Inventory", b =>
                 {
                     b.HasOne("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", "BikeModel")
@@ -696,12 +563,16 @@ namespace MotorBikeShop.Migrations
 
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.Entities.BikeModel", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Inventory");
                 });
 
             modelBuilder.Entity("MotorBikeShop.Areas.Identity.Data.MotorBikeShopUser", b =>
                 {
                     b.Navigation("Basket");
+
+                    b.Navigation("Comments");
 
                     b.Navigation("Vents");
                 });

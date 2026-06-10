@@ -57,5 +57,11 @@ namespace MotorBikeShop.Areas.Identity.Data.Entities
         public Inventory? Inventory { get; set; }
 
         public string ImageUrl { get; set; }
+
+        /// <summary>
+        /// Navigation property – one-to-many relationship with Comment.
+        /// A bike model can have many comments.
+        /// </summary>
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

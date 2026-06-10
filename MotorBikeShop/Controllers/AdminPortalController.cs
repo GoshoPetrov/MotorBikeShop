@@ -60,4 +60,23 @@ public class AdminPortalController : Controller
 
         return View(bikes);
     }
+
+    /// <summary>
+    /// AJAX endpoint: updates a single bike field inline.
+    /// Returns JSON with { success: true/false, errors: [...] }.
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateBikeField(int bikeId, string field, string value)
+    {
+        try
+        {
+            var updated = await _shopService.UpdateBikeFieldAsync(bikeId, field, value);
+            return Json(new { success = true, bike = updated });
+        }
+        catch (ShopException ex)
+        {
+            return Json(new { success = false, errors = new[] { ex.Message } });
+        }
+    }
 }

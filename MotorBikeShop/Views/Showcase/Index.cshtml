@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BikeViewModel>
+@model ShowcaseViewModel
 
 @if (!string.IsNullOrWhiteSpace(ViewBag.Message))
 {
@@ -9,8 +9,6 @@
 
 }
 
-
-
 <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2>Bike Showcase</h2>
 
@@ -20,6 +18,9 @@
 </div>
 
 <form asp-action="Index" method="get">
+    <input type="hidden" name="sortBy" value="@Model.SortBy" />
+    <input type="hidden" name="ascending" value="@Model.Ascending.ToString().ToLower()" />
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
     <input id="searchString" type="text" name="searchString" value="@Context.Request.Query["searchString"]"
            placeholder="Search by bike name..." />
     <button type="submit" class="btn btn-primary">Search</button>
@@ -27,12 +28,79 @@
     <div id="searchResults" class="list-group mt-1"></div>
 </form>
 
+<!-- Sort Controls -->
+<div class="row mb-3 mt-3">
+    <div class="col">
+        <strong>Sort by:</strong>
+        <a asp-action="Index"
+           asp-route-sortBy="Name"
+           asp-route-ascending="@(Model.SortBy == "Name" ? !Model.Ascending : true)"
+           asp-route-searchString="@Context.Request.Query["searchString"]"
+           asp-route-pageNumber="1"
+           asp-route-pageSize="@Model.PageSize"
+           class="text-decoration-none ms-1">
+            Name
+            @if (Model.SortBy == "Name")
+            {
+                <i class="bi bi-caret-@(Model.Ascending ? "up" : "down")-fill"></i>
+            }
+        </a>
+        <span class="mx-1">|</span>
+        <a asp-action="Index"
+           asp-route-sortBy="Brand"
+           asp-route-ascending="@(Model.SortBy == "Brand" ? !Model.Ascending : true)"
+           asp-route-searchString="@Context.Request.Query["searchString"]"
+           asp-route-pageNumber="1"
+           asp-route-pageSize="@Model.PageSize"
+           class="text-decoration-none">
+            Brand
+            @if (Model.SortBy == "Brand")
+            {
+                <i class="bi bi-caret-@(Model.Ascending ? "up" : "down")-fill"></i>
+            }
+        </a>
+        <span class="mx-1">|</span>
+        <a asp-action="Index"
+           asp-route-sortBy="Price"
+           asp-route-ascending="@(Model.SortBy == "Price" ? !Model.Ascending : true)"
+           asp-route-searchString="@Context.Request.Query["searchString"]"
+           asp-route-pageNumber="1"
+           asp-route-pageSize="@Model.PageSize"
+           class="text-decoration-none">
+            Price
+            @if (Model.SortBy == "Price")
+            {
+                <i class="bi bi-caret-@(Model.Ascending ? "up" : "down")-fill"></i>
+            }
+        </a>
+        <span class="mx-1">|</span>
+        <a asp-action="Index"
+           asp-route-sortBy="Year"
+           asp-route-ascending="@(Model.SortBy == "Year" ? !Model.Ascending : true)"
+           asp-route-searchString="@Context.Request.Query["searchString"]"
+           asp-route-pageNumber="1"
+           asp-route-pageSize="@Model.PageSize"
+           class="text-decoration-none">
+            Year
+            @if (Model.SortBy == "Year")
+            {
+                <i class="bi bi-caret-@(Model.Ascending ? "up" : "down")-fill"></i>
+            }
+        </a>
+    </div>
+</div>
 
-
-
+<!-- Results Summary -->
+<div class="row mb-2">
+    <div class="col">
+        <small class="text-muted">
+            Showing @Model.FirstItemIndex&ndash;@Model.LastItemIndex of @Model.TotalItems bike(s)
+        </small>
+    </div>
+</div>
 
 <div class="row">
-    @foreach (var bike in Model)
+    @foreach (var bike in Model.Bikes)
     {
         <div class="col-md-4">
             <div class="card" style="margin-bottom:20px;">
@@ -68,10 +136,55 @@
                 </div>
             </div>
         </div>
-
-
     }
 </div>
+
+<!-- Pagination -->
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Bike showcase navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Previous -->
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@(Model.PageNumber - 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-sortBy="@Model.SortBy"
+                   asp-route-ascending="@Model.Ascending"
+                   asp-route-searchString="@Context.Request.Query["searchString"]">
+                    &laquo; Previous
+                </a>
+            </li>
+
+            <!-- Page numbers -->
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pageNumber="@i"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-sortBy="@Model.SortBy"
+                       asp-route-ascending="@Model.Ascending"
+                       asp-route-searchString="@Context.Request.Query["searchString"]">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@(Model.PageNumber + 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-sortBy="@Model.SortBy"
+                   asp-route-ascending="@Model.Ascending"
+                   asp-route-searchString="@Context.Request.Query["searchString"]">
+                    Next &raquo;
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
 
 @section Scripts {
     <script>
@@ -135,5 +248,4 @@
             resultsBox.innerHTML = "";
         }
     </script>
-
 }

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using MotorBikeShop.Data;
 using MotorBikeShop.Services;
 
+namespace MotorBikeShop.Controllers;
+
 [Authorize] // only logged-in users can see bikes
 public class ShowcaseController : Controller
 {
@@ -15,12 +17,19 @@ public class ShowcaseController : Controller
     }
 
     // GET: Showcase
-    public async Task<IActionResult> Index(string searchString, string message)
+    public async Task<IActionResult> Index(
+        string? searchString,
+        string? sortBy,
+        bool ascending = true,
+        int pageNumber = 1,
+        int pageSize = 6,
+        string? message = null)
     {
-        var bikes = await _shopService.GetShowcase(searchString);
+        var model = await _shopService.GetShowcaseAsync(
+            searchString, sortBy, ascending, pageNumber, pageSize);
 
         ViewBag.Message = message;
-        return View(bikes);
+        return View(model);
     }
 
     // GET: Showcase/Details/5

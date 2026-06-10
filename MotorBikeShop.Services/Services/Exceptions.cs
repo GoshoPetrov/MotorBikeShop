@@ -10,15 +10,15 @@
 
     }
 
-    public class OutOfStockExeption : ShopException
+    public class OutOfStockException : ShopException
     {
-        public OutOfStockExeption() 
+        public OutOfStockException() 
             : base("Out of stock")
         {
             
         }
 
-        public OutOfStockExeption(string message)
+        public OutOfStockException(string message)
             : base(message)
         {
 

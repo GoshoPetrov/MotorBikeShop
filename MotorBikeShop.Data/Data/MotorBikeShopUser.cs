@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using MotorBikeShop.Areas.Identity.Data.Entities;
 
 namespace MotorBikeShop.Areas.Identity.Data;
 
@@ -20,5 +21,11 @@ public class MotorBikeShopUser : IdentityUser
     /// A user can have multiple orders.
     /// </summary>
     public ICollection<Vent> Vents { get; set; } = new List<Vent>();
+
+    /// <summary>
+    /// Navigation property – one-to-many relationship with Comment.
+    /// A user can write many comments.
+    /// </summary>
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }
 

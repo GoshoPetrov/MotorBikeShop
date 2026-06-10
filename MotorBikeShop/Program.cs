@@ -43,6 +43,9 @@ namespace MotorBikeShop
                 await IdentitySeeder.SeedAsync(userManager, roleManager);
             }
 
+            // Seed comments after users and bikes exist
+            await DatabaseInitializer.SeedCommentsAsync(app.Services, logger);
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

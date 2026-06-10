@@ -9,5 +9,10 @@ namespace MotorBikeShop.Services
     public interface ICurrentUserService
     {
         string? UserId { get; }
+
+        /// <summary>
+        /// Whether the current user is in the Admin role.
+        /// </summary>
+        bool IsAdmin { get; }
     }
 }
